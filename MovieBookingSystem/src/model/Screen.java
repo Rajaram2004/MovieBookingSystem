@@ -33,7 +33,6 @@ public class Screen {
                 seats.add(new Seat(seatNumber, row, col, seatType, seatPrice, false));
             }
         }
-        System.out.println("Screen " + screenNumber + " created with " + seats.size() + " seats.");
     }
 	
 	

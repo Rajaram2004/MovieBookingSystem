@@ -6,9 +6,11 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
+import java.util.stream.Collectors;
 
 import model.Movies;
 import model.Seat;
@@ -21,10 +23,13 @@ import util.Input;
 
 public class TicketService {
 	static HashMap<Long, Movies> movieDB = InMemoryDatabase.getMovieDB();
+	static HashMap<Long, Ticket> ticketDB = InMemoryDatabase.getTicketDB();
 
 	public TicketService() {
 
 	}
+
+	// ------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 	public void bookTicket(User user, String timeZone, HashMap<Long, Ticket> ticketDB) {
 
@@ -45,19 +50,10 @@ public class TicketService {
 				show, selectSeat, bookedEpoch, amount, true, true));
 		System.out.println("Your Ticket Successfully Booked");
 		System.out.println("Ticket ID: " + ticketDB.size());
-		
+
 	}
 
-	private Long ticketId;
-	private User user;
-	private Movies movie;
-	private Theatre theatre;
-	private Show show;
-	private List<Seat> seats;
-	private int bookingDateEpoch;
-	private double totalAmount;
-	private boolean isActive;
-	private boolean isComplete;
+	// ------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 	public void markBooked(List<Seat> selectSeat) {
 		for (Seat seat : selectSeat) {
@@ -66,8 +62,47 @@ public class TicketService {
 
 	}
 
+	public void filterMoviesByLanguage() {
+		HashSet<String> languages = new HashSet<>();
+		for (Movies m : movieDB.values()) {
+			languages.add(m.getLanguage());
+		}
+		int count = 1;
+		System.out.println("Available Languages:");
+		for (String lan : languages) {
+			System.out.println(count + ". " + lan);
+			count++;
+		}
+		System.out.println("Enter Your Choice : ");
+		int choice = Input.getInteger(count - 1);
+		count = 1;
+		String selectedLanguage = null;
+		for (String str : languages) {
+			if (count == choice) {
+				selectedLanguage = str;
+				break;
+			}
+			count++;
+		}
+		if (selectedLanguage == null) {
+			System.out.println("Invalid choice.");
+			return;
+		}
+		System.out.println("+----+-----------------------------+------------+--------+");
+		System.out.println("| ID | Title                       | Duration   | Year   |");
+		System.out.println("+----+-----------------------------+------------+--------+");
+
+		for (Movies m : movieDB.values()) {
+			if (m.getLanguage().equalsIgnoreCase(selectedLanguage)) {
+				System.out.printf("| %-2d | %-27s | %-10s | %-6d |\n", m.getMovieId(), m.getMovieTitle(),
+						m.getDuration(), m.getReleaseYear());
+			}
+		}
+
+		System.out.println("+----+-----------------------------+------------+--------+");
+	}
+
 	public void printAllMovies() {
-		// Table format
 		String format = "| %-4s | %-27s | %-10s | %-10s | %-10s | %-6s | %-32s |%n";
 
 		System.out.println(
@@ -96,7 +131,7 @@ public class TicketService {
 	}
 
 	public Movies selectMovie() {
-		printAllMovies(); // prints movies in a table
+		printAllMovies();
 		System.out.print("Please enter the Movie ID you wish to book: ");
 		int movieId = Input.getInteger(movieDB.size());
 
@@ -198,7 +233,7 @@ public class TicketService {
 					rowLabel++;
 				}
 
-				if (seat.isSeatStatus()) { // booked
+				if (seat.isSeatStatus()) {
 					System.err.printf("%-5s", "[X]" + seat.getSeatNumber());
 				} else {
 					System.out.printf("%-5s", "[ ]" + seat.getSeatNumber());
@@ -269,6 +304,93 @@ public class TicketService {
 			}
 		}
 		return total;
+	}
+
+	public void checkTicketStatus(String timeZone, User user) {
+		System.out.print("Enter your Ticket ID: ");
+		long ticketId = Input.getLong((long) ticketDB.size());
+		Ticket ticket = ticketDB.get(ticketId);
+		if (ticket == null) {
+			System.err.println("No ticket found with ID: " + ticketId);
+			return;
+		}
+
+		if (ticket.getUser().getUserId() != user.getUserId()) {
+			System.err.println("You Don't Have Permission to Access This Ticket");
+			return;
+		}
+
+		List<String> seats = ticket.getSeats().stream().map(s -> s.getSeatNumber()).collect(Collectors.toList());
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd MMM yyyy, hh:mm a");
+		ZonedDateTime zdt = Instant.ofEpochSecond(ticket.getShow().getDateTimeEpoch()).atZone(ZoneId.of(timeZone));
+		System.out.println("\n==================== TICKET DETAILS ====================");
+		System.out.printf("Ticket ID     : %d%n", ticket.getTicketId());
+		System.out.printf("Movie         : %s%n", ticket.getMovie().getMovieTitle());
+		System.out.printf("Theatre       : %s (%s)%n", ticket.getTheatre().getTheatreName(),
+				ticket.getTheatre().getTheatreLocation());
+		System.out.printf("Screen        : %s%n", ticket.getShow().getScreen().getScreenNumber());
+		System.out.printf("Seats         : %s%n", seats);
+		System.out.printf("Show DateTime : %s%n", zdt.format(formatter));
+		System.out.printf("Total Amount  : ₹%.2f%n", ticket.getTotalAmount());
+		System.out.printf("Status        : %s%n", ticket.isActive() ? "Active" : "Cancelled");
+		System.out.printf("Show Complete : %s%n", ticket.isComplete() ? "No" : "Yes");
+		System.out.println("========================================================\n");
+	}
+
+	public void viewMyBooking(User currentUser, String timeZone) {
+		List<Ticket> userTickets = ticketDB.values().stream().filter(t -> t.getUser().equals(currentUser))
+				.collect(Collectors.toList());
+
+		if (userTickets.isEmpty()) {
+			System.err.println("You have no bookings.");
+			return;
+		}
+
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd MMM yyyy, hh:mm a");
+		System.out.printf(
+				"+----+----------------------+----------------------+--------+----------------------+-----------+-----------+%n");
+		System.out.printf(
+				"| ID | Movie                | Theatre              | Screen | Show Date & Time     | Active    | Status    |%n");
+		System.out.printf(
+				"+----+----------------------+----------------------+--------+----------------------+-----------+-----------+%n");
+
+		for (Ticket ticket : userTickets) {
+			ZonedDateTime zdt = Instant.ofEpochSecond(ticket.getShow().getDateTimeEpoch()).atZone(ZoneId.of(timeZone));
+
+			String active = ticket.isActive() ? "Yes" : "No";
+			String status = ticket.isComplete() ? "No" : "Completed";
+
+			System.out.printf("| %-2d | %-20s | %-20s | %-6d | %-20s | %-9s | %-9s |%n", ticket.getTicketId(),
+					ticket.getMovie().getMovieTitle(), ticket.getTheatre().getTheatreName(),
+					ticket.getShow().getScreen().getScreenNumber(), zdt.format(formatter), active, status);
+		}
+
+		System.out.printf(
+				"+----+----------------------+----------------------+--------+----------------------+-----------+-----------+%n");
+	}
+
+	public void cancelTicket(User currentUser) {
+		System.out.print("Enter Ticket ID to cancel: ");
+		long ticketId = Input.getLong((long) ticketDB.size());
+
+		Ticket ticket = ticketDB.get(ticketId);
+		if (ticket == null || !ticket.getUser().equals(currentUser)) {
+			System.err.println("No ticket found with this ID for your account.");
+			return;
+		}
+
+		if (!ticket.isActive()) {
+			System.out.println("Ticket is already cancelled.");
+			return;
+		}
+
+		ticket.setActive(false);
+
+		for (Seat seat : ticket.getSeats()) {
+			seat.setSeatStatus(false);
+		}
+
+		System.out.println("Ticket ID " + ticketId + " has been successfully cancelled.");
 	}
 
 }

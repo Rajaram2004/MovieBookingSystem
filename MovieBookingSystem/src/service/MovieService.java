@@ -1,7 +1,10 @@
 package service;
 
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
 import java.util.Scanner;
+import java.util.Set;
 
 import model.Movies;
 import model.Theatre;
@@ -92,4 +95,41 @@ public class MovieService {
 		System.out.println(
 				"+------+-----------------------------+------------+------------+------------+--------+--------------------------------+");
 	}
+	
+	public void viewMoviesByGenre() {
+	    // Step 1: Collect all genres
+	    Set<String> genres = new HashSet<>();
+	    for (Movies movie : movieDB.values()) {
+	        genres.add(movie.getGenre());
+	    }
+
+	    // Step 2: Display genres with IDs
+	    System.out.println("Select a Genre:");
+	    int count = 1;
+	    Map<Integer, String> genreMap = new HashMap<>();
+	    for (String g : genres) {
+	        System.out.println(count + ". " + g);
+	        genreMap.put(count, g);
+	        count++;
+	    }
+
+	    // Step 3: User selects a genre
+	    int selectedId = Input.getInteger(count - 1);
+	    String selectedGenre = genreMap.get(selectedId);
+
+	    // Step 4: Display movies of that genre
+	    System.out.println("Movies in Genre: " + selectedGenre);
+	    System.out.println("+----+-----------------------------+--------+");
+	    System.out.println("| ID | Title                       | Year   |");
+	    System.out.println("+----+-----------------------------+--------+");
+
+	    for (Movies movie : movieDB.values()) {
+	        if (movie.getGenre().equalsIgnoreCase(selectedGenre)) {
+	            System.out.printf("| %-2d | %-27s | %-6d |\n",
+	                              movie.getMovieId(), movie.getMovieTitle(), movie.getReleaseYear());
+	        }
+	    }
+	    System.out.println("+----+-----------------------------+--------+");
+	}
+
 }

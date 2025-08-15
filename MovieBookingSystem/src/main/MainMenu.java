@@ -9,11 +9,16 @@ import model.Ticket;
 import model.User;
 import repository.InMemoryDatabase;
 import service.MovieService;
+import service.TheatreService;
 import service.TicketService;
 import util.Input;
 import util.TimeZoneConverter;
 
 public class MainMenu {
+	static TicketService ticketServiceObj = new TicketService();
+	static	MovieService movieServiceObj = new MovieService();
+	static TheatreService theatreService = new TheatreService();
+	static HashMap<Long,Ticket> ticketDB = InMemoryDatabase.getTicketDB();
 	public static void Start() {
 		InMemoryDatabase DB = new InMemoryDatabase();
 		int choice = mainMenu();
@@ -21,9 +26,7 @@ public class MainMenu {
 	}
 
 	public static void call(int choice) {
-		TicketService ticketServiceObj = new TicketService();
-		MovieService movieServiceObj = new MovieService();
-		HashMap<Long,Ticket> ticketDB = InMemoryDatabase.getTicketDB();
+		
 		switch (choice) {
 		case 1:
 			String timeZone = TimeZoneConverter.selectTimeZone();
@@ -34,7 +37,7 @@ public class MainMenu {
 			} else if (num1 == 2) {
 				 user = createNewUser();
 			}
-			Operations.operation(user,ticketServiceObj,movieServiceObj,timeZone,ticketDB);
+			Operations.operation(user,ticketServiceObj,movieServiceObj,theatreService,timeZone,ticketDB);
 
 			break;
 		case 2:

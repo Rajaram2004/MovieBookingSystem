@@ -32,4 +32,19 @@ public class Input {
 			return getInteger(maxValue);
 		}
 	}
+	
+	public static long getLong(Long n) {
+        while (true) {
+            try {
+                String input = SCANNER.nextLine().trim();
+                Long num =  Long.parseLong(input);
+                if(num >0 && num <= n) {
+                	return num;
+                }
+                	
+            } catch (NumberFormatException e) {
+                System.err.print("Invalid input. Please enter a valid number: ");
+            }
+        }
+    }
 }
