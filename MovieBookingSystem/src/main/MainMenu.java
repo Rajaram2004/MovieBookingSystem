@@ -41,13 +41,15 @@ public class MainMenu {
 
 			break;
 		case 2:
+			String timeZone2 = TimeZoneConverter.selectTimeZone();
 			TheatreAdmin theatreAdmin = callTheatreAdmin();
 			TheatreAdminOperations.theatreAminOperations(theatreAdmin);
 
 			break;
 		case 3:
+			String timeZone3 = TimeZoneConverter.selectTimeZone();
 			Admin admin = callAdmin();
-			AdminOperations.adminOperations(admin);
+			AdminOperations.adminOperations(admin,timeZone3);
 			break;
 		case 4:
 			System.out.println("You Have Selected Exit , Thank You");

@@ -177,7 +177,6 @@ public class InMemoryDatabase {
 	
 	
 	public void initializeMoviesAndTheatres() {
-	    // 1️⃣ Create 10 theatres with 3 screens each
 	    String[] theatreNames = {
 	        "Sathyam Cinemas", "KG Cinemas", "INOX", "Thangam Cinemas", "PVR Velachery",
 	        "PVR Phoenix", "Escape Cinemas", "AVM Cinemas", "SPI Cinemas", "Mayajaal"
@@ -198,7 +197,6 @@ public class InMemoryDatabase {
 	        theatreDB.put((long) (t + 1), theatre);
 	    }
 
-	    // 2️⃣ Create 12 movies
 	    String[] movieTitles = {
 	        "Vikram", "Master", "Jailer", "Leo", "RRR", "Pushpa: The Rise",
 	        "Baahubali: The Beginning", "Baahubali: The Conclusion",
@@ -222,7 +220,7 @@ public class InMemoryDatabase {
 	    List<Movies> movies = new ArrayList<>();
 	    Random rand = new Random();
 	    for (int m = 0; m < movieTitles.length; m++) {
-	        int numTheatres = 2 + rand.nextInt(3); // 2-4 theatres per movie
+	        int numTheatres = 2 + rand.nextInt(3); 
 	        List<Theatre> movieTheatres = new ArrayList<>();
 	        while (movieTheatres.size() < numTheatres) {
 	            Theatre th = theatres.get(rand.nextInt(theatres.size()));
@@ -234,21 +232,18 @@ public class InMemoryDatabase {
 	        movieDB.put((long) (m + 1), movie);
 	    }
 
-	    // 3️⃣ Create shows with different date & time
+	   
 	    long showId = 1L;
-	    LocalDate startDate = LocalDate.now().plusDays(1); // shows start from tomorrow
+	    LocalDate startDate = LocalDate.now().plusDays(1); 
 	    for (Movies movie : movies) {
 	        for (Theatre theatre : movie.getListOfTheatre()) {
 	            List<Screen> theatreScreens = theatre.getListOfScreen();
 	            for (int i = 0; i < theatreScreens.size(); i++) {
 	                Screen screen = theatreScreens.get(i);
-	                // Different date & time for each show
-	                LocalDate showDate = startDate.plusDays(rand.nextInt(5)); // within next 5 days
-	                LocalTime showTime = LocalTime.of(10 + rand.nextInt(9), rand.nextBoolean() ? 0 : 30); // 10:00 to 18:30
+	                LocalDate showDate = startDate.plusDays(rand.nextInt(5));
+	                LocalTime showTime = LocalTime.of(10 + rand.nextInt(9), rand.nextBoolean() ? 0 : 30); 
 	                ZonedDateTime zdt = ZonedDateTime.of(showDate, showTime, ZoneId.of("Asia/Kolkata"));
 	                int epoch = (int) zdt.toEpochSecond();
-
-	                // Seats
 	                List<Seat> seats = new ArrayList<>();
 	                for (int r = 1; r <= 10; r++) {
 	                    for (int c = 1; c <= 12; c++) {
@@ -256,13 +251,16 @@ public class InMemoryDatabase {
 	                        seats.add(new Seat(seatNum, r, c, "Regular", 150, true));
 	                    }
 	                }
-
 	                Show show = new Show(showId++, theatre, movie, screen, epoch, seats);
 	                theatre.addShow(show);
 	                showDB.put(show.getShowId(), show);
 	            }
 	        }
 	    }
+	    theatreAdminDB.get(1L).setTheatre(theatreDB.get(1L));
+	    theatreAdminDB.get(2L).setTheatre(theatreDB.get(2L));
+	    theatreAdminDB.get(3L).setTheatre(theatreDB.get(3L));
+	    
 	}
 
 
