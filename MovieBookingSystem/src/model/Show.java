@@ -18,7 +18,6 @@ public class Show {
         this.screen = screen;
         this.dateTimeEpoch = dateTimeEpoch;
 
-        // Clone seats from screen
         this.seats = new ArrayList<>();
         for (Seat s : screen.getSeats()) {
             Seat clonedSeat = new Seat(

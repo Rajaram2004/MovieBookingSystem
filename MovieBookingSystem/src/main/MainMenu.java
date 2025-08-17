@@ -16,9 +16,10 @@ import util.TimeZoneConverter;
 
 public class MainMenu {
 	static TicketService ticketServiceObj = new TicketService();
-	static	MovieService movieServiceObj = new MovieService();
+	static MovieService movieServiceObj = new MovieService();
 	static TheatreService theatreService = new TheatreService();
-	static HashMap<Long,Ticket> ticketDB = InMemoryDatabase.getTicketDB();
+	static HashMap<Long, Ticket> ticketDB = InMemoryDatabase.getTicketDB();
+
 	public static void Start() {
 		InMemoryDatabase DB = new InMemoryDatabase();
 		int choice = mainMenu();
@@ -26,30 +27,30 @@ public class MainMenu {
 	}
 
 	public static void call(int choice) {
-		
+
 		switch (choice) {
 		case 1:
 			String timeZone = TimeZoneConverter.selectTimeZone();
 			User user = null;
 			int num1 = printloginRegister();
 			if (num1 == 1) {
-				 user = callUser();
+				user = callUser();
 			} else if (num1 == 2) {
-				 user = createNewUser();
+				user = createNewUser();
 			}
-			Operations.operation(user,ticketServiceObj,movieServiceObj,theatreService,timeZone,ticketDB);
+			Operations.operation(user, ticketServiceObj, movieServiceObj, theatreService, timeZone, ticketDB);
 
 			break;
 		case 2:
 			String timeZone2 = TimeZoneConverter.selectTimeZone();
 			TheatreAdmin theatreAdmin = callTheatreAdmin();
-			TheatreAdminOperations.theatreAminOperations(theatreAdmin);
+			TheatreAdminOperations.theatreAminOperations(theatreAdmin,timeZone2);
 
 			break;
 		case 3:
 			String timeZone3 = TimeZoneConverter.selectTimeZone();
 			Admin admin = callAdmin();
-			AdminOperations.adminOperations(admin,timeZone3);
+			AdminOperations.adminOperations(admin, timeZone3);
 			break;
 		case 4:
 			System.out.println("You Have Selected Exit , Thank You");
@@ -263,7 +264,7 @@ public class MainMenu {
 					if (foundAdmin == null) {
 						System.err.println(" Phone number not found!");
 					} else {
-						break; // valid phone number found
+						break;
 					}
 				} else {
 					System.err.println("Invalid input! Please enter 6–12 digits only.");
@@ -352,7 +353,6 @@ public class MainMenu {
 		Long newUserId = (long) (userDB.size() + 1);
 		newUser.setUserId(newUserId);
 
-		// Get User Name (Only alphabets and spaces, min 3 characters)
 		while (true) {
 			System.out.print("Enter Your Name: ");
 			String name = sc.nextLine().trim();
@@ -364,7 +364,6 @@ public class MainMenu {
 			}
 		}
 
-		// Get Email (Basic pattern check)
 		while (true) {
 			System.out.print("Enter Your Email: ");
 			String email = sc.nextLine().trim();
@@ -412,7 +411,6 @@ public class MainMenu {
 			}
 		}
 
-		// Get Preferred Location (Min 2 chars)
 		while (true) {
 			System.out.print("Enter Your Preferred Location: ");
 			String location = sc.nextLine().trim();
@@ -424,7 +422,6 @@ public class MainMenu {
 			}
 		}
 
-		// Get Password (Min 6 chars, at least 1 digit, 1 special char, 1 uppercase)
 		while (true) {
 			System.out.print("Enter Your Password: ");
 			String password = sc.nextLine().trim();

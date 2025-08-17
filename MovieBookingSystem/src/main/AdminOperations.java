@@ -49,6 +49,16 @@ public class AdminOperations {
 			adminOperations(admin, timeZone);
 			break;
 		case 8:
+			System.out.println("You Have Selected Add Theatre Admin ");
+			adminService.addTheatreAdmin();
+			adminOperations(admin, timeZone);
+			break;
+		case 9:
+			System.out.println("You Have Selected Print All Shows ");
+			adminService.printAllShows(timeZone);
+			adminOperations(admin, timeZone);
+			break;
+		case 10:
 			System.out.println("You Have Selected Exit ");
 			int choice = MainMenu.mainMenu();
 			MainMenu.call(choice);
@@ -62,7 +72,7 @@ public class AdminOperations {
 
 		String[] features = { "1 . View All Users ", "2 . Search User By Id ", "3 . Search User By Name",
 				"4 . View All Theatre Admins", "5 . Search Theatre Admin By Id", "6 . Search Theatre Admin By Name",
-				"7 . add New Movie","8 . Exit" };
+				"7 . add New Movie","8 . Add Theatre Admin ","9 . Print All Shows","10 . Exit" };
 
 		int n = features.length;
 		for (int i = 0; i < n; i++) {

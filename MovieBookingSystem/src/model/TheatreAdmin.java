@@ -18,6 +18,9 @@ public class TheatreAdmin {
 		this.theatreAdminPassword = theatreAdminPassword;
 		this.theatre = theatre;
 	}
+	public TheatreAdmin() {
+		
+	}
 	public String getTheatreAdminName() {
 		return theatreAdminName;
 	}

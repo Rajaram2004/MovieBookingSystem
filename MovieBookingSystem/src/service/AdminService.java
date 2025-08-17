@@ -1,13 +1,19 @@
 package service;
 
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Scanner;
+import java.util.regex.Pattern;
 
 import model.Movies;
+import model.Show;
 import model.Theatre;
 import model.TheatreAdmin;
 import model.User;
@@ -18,10 +24,10 @@ public class AdminService {
 	static HashMap<Long, User> userDB = InMemoryDatabase.getUserDB();
 	static HashMap<Long, TheatreAdmin> theatreAdminDB = InMemoryDatabase.getTheatreAdminDB();
 	static HashMap<Long, Movies> movieDB = InMemoryDatabase.getMovieDB();
-	List<String> validLanguages = Arrays.asList(
-		    "Hindi", "English", "Tamil", "Telugu", "Bengali",
-		    "Marathi", "Gujarati", "Urdu", "Kannada", "Malayalam"
-		);
+	static HashMap<Long, Theatre> theatreDB = InMemoryDatabase.getTheatreDB();
+	static HashMap<Long, Show> showDB = InMemoryDatabase.getShowDB();
+	List<String> validLanguages = Arrays.asList("Hindi", "English", "Tamil", "Telugu", "Bengali", "Marathi", "Gujarati",
+			"Urdu", "Kannada", "Malayalam");
 	private static final String LINE = "+-----+----------------------+---------------------------+-----------------+------+------------------------+-----------------+";
 	private static final String HEADER_FMT = "| %-3s | %-20s | %-25s | %-15s | %-4s | %-22s | %-15s |%n";
 	private static final String ROW_FMT = "| %-3d | %-20s | %-25s | %-15s | %-4s | %-22s | %-15s |%n";
@@ -324,4 +330,104 @@ public class AdminService {
 		return s.length() <= max ? s : s.substring(0, max - 3) + "...";
 	}
 
+	public void addTheatreAdmin() {
+		TheatreAdmin admin = new TheatreAdmin();
+		Scanner sc = Input.getScanner();
+		long newTheatreId = (long) (theatreAdminDB.size() + 1);
+		admin.setTheatreAdminId(newTheatreId);
+
+		String name;
+		while (true) {
+			System.out.print("Enter Theatre Admin Name: ");
+			name = sc.nextLine().trim();
+			if (!name.isEmpty()) {
+				admin.setTheatreAdminName(name);
+				break;
+			}
+			System.err.println("Name cannot be empty. Please re-enter.");
+		}
+
+		String email;
+		while (true) {
+			System.out.print("Enter Theatre Admin Email: ");
+			email = sc.nextLine().trim();
+			if (isValidEmail(email)) {
+				admin.setTheatreAdminEmailId(email);
+				break;
+			}
+			System.err.println("Invalid email format. Please re-enter.");
+		}
+		Long phone = null;
+		while (true) {
+			System.out.print("Enter Theatre Admin Phone (10 digits): ");
+			String input = sc.nextLine().trim();
+			if (input.matches("\\d{10}")) {
+				phone = Long.parseLong(input);
+				admin.setTheatreAdminPhoneNumber(phone);
+				break;
+			}
+			System.err.println("Invalid phone number. Must be 10 digits.");
+		}
+
+		// Password validation
+		String password;
+		while (true) {
+			System.out.print("Enter Theatre Admin Password (min 6 chars): ");
+			password = sc.nextLine().trim();
+			if (password.length() >= 6) {
+				admin.setTheatreAdminPassword(password);
+				break;
+			}
+			System.err.println("Password must be at least 6 characters.");
+		}
+
+		Theatre theatre = null;
+		while (true) {
+			System.out.print("Enter Theatre ID to assign: ");
+			String input = sc.nextLine().trim();
+			try {
+				long theatreId = Long.parseLong(input);
+				theatre = theatreDB.get(theatreId);
+				if (theatre != null) {
+					admin.setTheatre(theatre);
+					break;
+				} else {
+					System.err.println("Invalid Theatre ID. Please re-enter.");
+				}
+			} catch (NumberFormatException e) {
+				System.err.println("Invalid input. Enter a valid numeric Theatre ID.");
+			}
+		}
+
+		// Save admin
+		theatreAdminDB.put(admin.getTheatreAdminId(), admin);
+		System.out.println("Theatre Admin added successfully: " + admin.getTheatreAdminName());
+	}
+
+	private static boolean isValidEmail(String email) {
+		String regex = "^[A-Za-z0-9+_.-]+@(.+)$";
+		Pattern pattern = Pattern.compile(regex);
+		return pattern.matcher(email).matches();
+	}
+
+	public void printAllShows(String timeZone) {
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm").withZone(ZoneId.of(timeZone));
+
+		System.out.println("+---------+--------------+--------------+-----------+-------------------+");
+		System.out.println("| Show ID | Theatre      | Movie        | Screen    | Date & Time       |");
+		System.out.println("+---------+--------------+--------------+-----------+-------------------+");
+
+		for (Map.Entry<Long, Show> entry : showDB.entrySet()) {
+			Show s = entry.getValue();
+
+			String dateTime = formatter.format(Instant.ofEpochSecond(s.getDateTimeEpoch()));
+
+			System.out.printf("| %-7d | %-12s | %-12s | %-9s | %-17s |\n", s.getShowId(),
+					s.getTheatre().getTheatreName(), s.getMovie().getMovieTitle(), s.getScreen().getScreenNumber(),
+					dateTime);
+
+		}
+
+		System.out.println("+---------+--------------+--------------+-----------+-------------------+");
+	}
 }

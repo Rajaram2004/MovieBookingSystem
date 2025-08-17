@@ -16,6 +16,7 @@ import model.Movies;
 import model.Seat;
 import model.Show;
 import model.Theatre;
+import model.TheatreAdmin;
 import model.Ticket;
 import model.User;
 import repository.InMemoryDatabase;
@@ -54,6 +55,55 @@ public class TicketService {
 	}
 
 	// ------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+	public Movies selectTheatreMovie(TheatreAdmin theatreAdmin) {
+		printTheatrelMovies(theatreAdmin);
+		System.out.print("Please enter the Movie ID you wish to book: ");
+		int movieId = Input.getInteger(movieDB.size());
+
+		for (Movies m : movieDB.values()) {
+			if (m.getMovieId() == movieId) {
+				return m;
+			}
+		}
+		System.out.println("Invalid Movie ID.");
+		return null;
+	}
+
+	public void printTheatrelMovies(TheatreAdmin theatreAdmin) {
+		String format = "| %-4s | %-27s | %-10s | %-10s | %-10s | %-6s | %-32s |%n";
+
+		System.out.println(
+				"+------+-----------------------------+------------+------------+------------+--------+--------------------------------+");
+		System.out.format(format, "ID", "Title", "Duration", "Genre", "Language", "Year", "Theatres");
+		System.out.println(
+				"+------+-----------------------------+------------+------------+------------+--------+--------------------------------+");
+		List<Show> show = theatreAdmin.getTheatre().getListOfShow();
+		List<Long> list = new ArrayList<>();
+		for (Show sh : show) {
+			list.add(sh.getMovie().getMovieId());
+		}
+		for (Movies m : movieDB.values()) {
+			if (list.contains(m.getMovieId())) {
+				String theatres = m.getListOfTheatre().stream().map(Theatre::getTheatreName)
+						.reduce((a, b) -> a + ", " + b).orElse("No Theatre");
+
+				int hours = m.getDuration() / 60;
+				int minutes = m.getDuration() % 60;
+				String durationFormatted = String.format("%d hr %02d min", hours, minutes);
+
+				if (theatres.length() > 30) {
+					theatres = theatres.substring(0, 27) + "...";
+				}
+
+				System.out.format(format, m.getMovieId(), m.getMovieTitle(), durationFormatted, m.getGenre(),
+						m.getLanguage(), m.getReleaseYear(), theatres);
+			}
+
+		}
+		System.out.println(
+				"+------+-----------------------------+------------+------------+------------+--------+--------------------------------+");
+	}
 
 	public void markBooked(List<Seat> selectSeat) {
 		for (Seat seat : selectSeat) {

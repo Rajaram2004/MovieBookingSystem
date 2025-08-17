@@ -9,7 +9,6 @@ public class User {
 	private String userPassword;
     public User() {
 		
-		
 	}
 	public User(Long userId, String userName, String userEmailId, Long userPhoneNumber, String userPreferredLocation,
 			String userPassword) {
