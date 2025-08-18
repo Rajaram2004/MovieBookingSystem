@@ -73,7 +73,7 @@ public class MainMenu {
 		HashMap<Long, Admin> AdminDB = InMemoryDatabase.getAdminDB();
 		Admin foundUser = null;
 		if (choice == 1) {
-			// Phone number validation and search
+			
 			while (true) {
 				System.out.print("Enter Your Phone Number (6–12 digits): ");
 				String input = sc.nextLine().trim();
@@ -88,14 +88,14 @@ public class MainMenu {
 					if (foundUser == null) {
 						System.err.println(" Phone number not found!");
 					} else {
-						break; // valid phone number found
+						break;
 					}
 				} else {
 					System.err.println("Invalid input! Please enter 6–12 digits only.");
 				}
 			}
 
-			// Password validation
+		
 
 		} else if (choice == 2) {
 			while (true) {
@@ -155,7 +155,6 @@ public class MainMenu {
 		System.out.println(userDB);
 		User foundUser = null;
 		if (choice == 1) {
-			// Phone number validation and search
 			while (true) {
 				System.out.print("Enter Your Phone Number (6–12 digits): ");
 				String input = sc.nextLine().trim();
@@ -170,14 +169,12 @@ public class MainMenu {
 					if (foundUser == null) {
 						System.err.println(" Phone number not found!");
 					} else {
-						break; // valid phone number found
+						break; 
 					}
 				} else {
 					System.err.println("Invalid input! Please enter 6–12 digits only.");
 				}
 			}
-
-			// Password validation
 
 		} else if (choice == 2) {
 			while (true) {
@@ -249,7 +246,6 @@ public class MainMenu {
 
 		TheatreAdmin foundAdmin = null;
 		if (choice == 1) {
-			// Phone number validation and search
 			while (true) {
 				System.out.print("Enter Your Phone Number (6–12 digits): ");
 				String input = sc.nextLine().trim();
@@ -271,7 +267,6 @@ public class MainMenu {
 				}
 			}
 
-			// Password validation
 
 		} else if (choice == 2) {
 			System.out.println(theatreDb);
@@ -348,8 +343,6 @@ public class MainMenu {
 		HashMap<Long, User> userDB = InMemoryDatabase.getUserDB();
 
 		User newUser = new User();
-
-		// Auto-generate User ID
 		Long newUserId = (long) (userDB.size() + 1);
 		newUser.setUserId(newUserId);
 
@@ -385,8 +378,6 @@ public class MainMenu {
 				System.err.println("Invalid Email format!");
 			}
 		}
-
-		// Get Phone Number (6–12 digits)
 		while (true) {
 			System.out.print("Enter Your Phone Number (6–12 digits): ");
 			String phone = sc.nextLine().trim();
@@ -418,7 +409,7 @@ public class MainMenu {
 				newUser.setUserPreferredLocation(location);
 				break;
 			} else {
-				System.err.println("Preferred location must have at least 2 characters!");
+				System.err.println("Preferred location must have at least 4 characters!");
 			}
 		}
 
@@ -433,8 +424,6 @@ public class MainMenu {
 						"Password must be at least 6 characters, contain 1 uppercase, 1 number, and 1 special character.");
 			}
 		}
-
-		// Add to DB
 		userDB.put(newUser.getUserId(), newUser);
 		System.out.println(" User Registered Successfully! ");
 		return newUser;

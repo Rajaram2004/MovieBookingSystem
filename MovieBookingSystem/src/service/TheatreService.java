@@ -10,7 +10,6 @@ public class TheatreService {
 	public TheatreService(){
 		
 	}
-	
 	public void printAllTheatres() {
 	    System.out.println("+----+---------------------+------------+----------------+---------------------+");
 	    System.out.println("| ID | Theatre Name        | Location   | Number of Screens   | Number of Shows|");
@@ -24,7 +23,6 @@ public class TheatreService {
 	                theatre.getListOfScreen().size(),
 	                theatre.getListOfShow().size());
 	    }
-
 	    System.out.println("+----+---------------------+------------+----------------+---------------------+");
 	}
 

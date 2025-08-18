@@ -192,7 +192,7 @@ public class InMemoryDatabase {
 	        for (int s = 1; s <= 3; s++) {
 	            screens.add(new Screen(s, null, 10, 12));
 	        }
-	        Theatre theatre = new Theatre(101L + t, theatreNames[t], theatreCities[t], screens, new ArrayList<>());
+	        Theatre theatre = new Theatre(1L + t, theatreNames[t], theatreCities[t], screens, new ArrayList<>());
 	        theatres.add(theatre);
 	        theatreDB.put((long) (t + 1), theatre);
 	    }
@@ -262,9 +262,6 @@ public class InMemoryDatabase {
 	    theatreAdminDB.get(3L).setTheatre(theatreDB.get(3L));
 	    
 	}
-
-
-
 
 	public static HashMap<Long, User> getUserDB() {
 		return userDB;

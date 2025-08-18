@@ -34,8 +34,6 @@ public class Screen {
             }
         }
     }
-	
-	
 	public int getScreenNumber() {
 		return screenNumber;
 	}

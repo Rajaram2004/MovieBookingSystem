@@ -40,6 +40,9 @@ public class Theatre {
 	public List<Screen> getListOfScreen() {
 		return listOfScreen;
 	}
+	public void addScreen(int row,int col) {
+		listOfScreen.add(new Screen(listOfScreen.size()+1,null,row,col));
+	}
 	public void setListOfScreen(List<Screen> listOfScreen) {
 		this.listOfScreen = listOfScreen;
 	}

@@ -284,9 +284,9 @@ public class TicketService {
 				}
 
 				if (seat.isSeatStatus()) {
-					System.err.printf("%-5s", "[X]" + seat.getSeatNumber());
+					System.err.printf("%-5s ", " [X]" + seat.getSeatNumber());
 				} else {
-					System.out.printf("%-5s", "[ ]" + seat.getSeatNumber());
+					System.out.printf("%-5s ", " [ ]" + seat.getSeatNumber());
 					availableCount++;
 				}
 
@@ -387,36 +387,79 @@ public class TicketService {
 		System.out.println("========================================================\n");
 	}
 
+//	public void viewMyBooking(User currentUser, String timeZone) {
+//		List<Ticket> userTickets = ticketDB.values().stream().filter(t -> t.getUser().equals(currentUser))
+//				.collect(Collectors.toList());
+//		if (userTickets.isEmpty()) {
+//			System.err.println("You have no bookings.");
+//			return;
+//		}
+//		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd MMM yyyy, hh:mm a");
+//		System.out.printf(
+//				"+----+----------------------+----------------------+--------+----------------------+-----------+-----------+%n");
+//		System.out.printf(
+//				"| ID | Movie                | Theatre              | Screen | Show Date & Time     | Active    | Status    |%n");
+//		System.out.printf(
+//				"+----+----------------------+----------------------+--------+----------------------+-----------+-----------+%n");
+//		for (Ticket ticket : userTickets) {
+//			ZonedDateTime zdt = Instant.ofEpochSecond(ticket.getShow().getDateTimeEpoch()).atZone(ZoneId.of(timeZone));
+//
+//			String active = ticket.isActive() ? "Yes" : "No";
+//			String status = ticket.isComplete() ? "No" : "Completed";
+//
+//			System.out.printf("| %-2d | %-20s | %-20s | %-6d | %-20s | %-9s | %-9s |%n", ticket.getTicketId(),
+//					ticket.getMovie().getMovieTitle(), ticket.getTheatre().getTheatreName(),
+//					ticket.getShow().getScreen().getScreenNumber(), zdt.format(formatter), active, status);
+//			
+//		}
+//
+//		System.out.printf(
+//				"+----+----------------------+----------------------+--------+----------------------+-----------+-----------+%n");
+//	}
+	
 	public void viewMyBooking(User currentUser, String timeZone) {
-		List<Ticket> userTickets = ticketDB.values().stream().filter(t -> t.getUser().equals(currentUser))
-				.collect(Collectors.toList());
+	    List<Ticket> userTickets = ticketDB.values().stream()
+	            .filter(t -> t.getUser().equals(currentUser))
+	            .collect(Collectors.toList());
 
-		if (userTickets.isEmpty()) {
-			System.err.println("You have no bookings.");
-			return;
-		}
+	    if (userTickets.isEmpty()) {
+	        System.err.println("You have no bookings.");
+	        return;
+	    }
 
-		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd MMM yyyy, hh:mm a");
-		System.out.printf(
-				"+----+----------------------+----------------------+--------+----------------------+-----------+-----------+%n");
-		System.out.printf(
-				"| ID | Movie                | Theatre              | Screen | Show Date & Time     | Active    | Status    |%n");
-		System.out.printf(
-				"+----+----------------------+----------------------+--------+----------------------+-----------+-----------+%n");
+	    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd MMM yyyy, hh:mm a");
+	    System.out.printf(
+	            "+----+----------------------+----------------------+--------+----------------------+-----------+-----------+----------------------+%n");
+	    System.out.printf(
+	            "| ID | Movie                | Theatre              | Screen | Show Date & Time     | Active    | Status    | Seats                |%n");
+	    System.out.printf(
+	            "+----+----------------------+----------------------+--------+----------------------+-----------+-----------+----------------------+%n");
 
-		for (Ticket ticket : userTickets) {
-			ZonedDateTime zdt = Instant.ofEpochSecond(ticket.getShow().getDateTimeEpoch()).atZone(ZoneId.of(timeZone));
+	    for (Ticket ticket : userTickets) {
+	    	
+	    	List<String> seatNumber = ticket.getSeats().stream().map(s -> s.getSeatNumber()).collect(Collectors.toList());
+	        ZonedDateTime zdt = Instant.ofEpochSecond(ticket.getShow().getDateTimeEpoch())
+	                                   .atZone(ZoneId.of(timeZone));
 
-			String active = ticket.isActive() ? "Yes" : "No";
-			String status = ticket.isComplete() ? "No" : "Completed";
+	        String active = ticket.isActive() ? "Yes" : "No";
+	        String status = ticket.isComplete() ? "Completed" : "No"; // I think you meant this
+	        String seats = String.join(", ", ticket.getSeats().stream()
+	                                               .map(Object::toString)
+	                                               .collect(Collectors.toList()));
 
-			System.out.printf("| %-2d | %-20s | %-20s | %-6d | %-20s | %-9s | %-9s |%n", ticket.getTicketId(),
-					ticket.getMovie().getMovieTitle(), ticket.getTheatre().getTheatreName(),
-					ticket.getShow().getScreen().getScreenNumber(), zdt.format(formatter), active, status);
-		}
+	        System.out.printf("| %-2d | %-20s | %-20s | %-6s | %-20s | %-9s | %-9s | %-20s |%n",
+	                ticket.getTicketId(),
+	                ticket.getMovie().getMovieTitle(),
+	                ticket.getTheatre().getTheatreName(),
+	                ticket.getShow().getScreen().getScreenNumber(),
+	                zdt.format(formatter),
+	                active,
+	                status,
+	                seatNumber);
+	    }
 
-		System.out.printf(
-				"+----+----------------------+----------------------+--------+----------------------+-----------+-----------+%n");
+	    System.out.printf(
+	            "+----+----------------------+----------------------+--------+----------------------+-----------+-----------+----------------------+%n");
 	}
 
 	public void cancelTicket(User currentUser) {
@@ -430,7 +473,7 @@ public class TicketService {
 		}
 
 		if (!ticket.isActive()) {
-			System.out.println("Ticket is already cancelled.");
+			System.err.println("Ticket is already cancelled.");
 			return;
 		}
 

@@ -37,7 +37,6 @@ public class TheatreAdminService {
 			System.out.println(details[i]);
 		}
 		int choice = 0;
-
 		System.out.println("Enter Your Choice : ");
 		choice = Input.getInteger(details.length);
 		switch (choice) {
@@ -49,13 +48,11 @@ public class TheatreAdminService {
 			System.out.println("You Have Selected Edit Theatre Admin Phone Number ");
 			editTheatreAdminPhoneNumber(theatreAdmin);
 			break;
-
 		case 3:
 			System.out.println("You Have Selected Edit Theatre Admin Password ");
 			changeTheatreAdminPassword(theatreAdmin);
 			break;
 		}
-
 	}
 
 	private void changeTheatreAdminPassword(TheatreAdmin theatreAdmin) {
@@ -123,7 +120,6 @@ public class TheatreAdminService {
 	private boolean isValidName(String name) {
 		return name != null && name.matches("^[A-Za-z ]+$");
 	}
-
 	// -------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 	public void addShow(TheatreAdmin theatreAdmin) {
@@ -135,28 +131,56 @@ public class TheatreAdminService {
 		long showId = (long) showDB.size() + 1;
 		Show show = new Show(showId, theatre, movie, screen, (int) epochTime, null);
 
-		showDB.put(showId, show);
+		if (isValidShowTime(theatre, screen, epochTime, movie.getDuration())) {
+			theatre.addShow(show);
+			movie.addTheatreToListOfThetare(theatre);
+			System.out.println("Show Successfully Created and ID is " + showId);
+			showDB.put(showId, show);
+		} else {
+			System.err.println("Error: Show time collides with an existing show on this screen!");
+		}
 	}
-
 	// -------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+	public void searchShowId(String timeZone) {
+		System.out.println("Enter the Show Id You want to Search : ");
+		Long searchShowId = Input.getLong((long) showDB.size());
+		Show s = showDB.get(searchShowId);
+
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm").withZone(ZoneId.of(timeZone));
+		System.out.println("+---------+--------------+--------------+-----------+-------------------+");
+		System.out.println("| Show ID | Theatre      | Movie        | Screen    | Date & Time       |");
+		System.out.println("+---------+--------------+--------------+-----------+-------------------+");
+
+		String dateTime = formatter.format(Instant.ofEpochSecond(s.getDateTimeEpoch()));
+		System.out.printf("| %-7d | %-12s | %-12s | %-9s | %-17s |\n", s.getShowId(), s.getTheatre().getTheatreName(),
+				s.getMovie().getMovieTitle(), s.getScreen().getScreenNumber(), dateTime);
+
+		System.out.println("+---------+--------------+--------------+-----------+-------------------+");
+
+	}
 
 	private Screen getValidScreen(Theatre theatre) {
 
 		while (true) {
 			System.out.println("Available Screen: ");
 			List<Integer> list = new ArrayList<>();
-			for(Screen s:theatre.getListOfScreen()) {
+			for (Screen s : theatre.getListOfScreen()) {
 				list.add(s.getScreenNumber());
 			}
 			System.out.println(list);
 			System.out.print("Enter Screen Number : ");
 
 			String input = sc.nextLine();
-			Long screenNumber = Long.parseLong(input);
-			for (Screen s : theatre.getListOfScreen()) {
-				if (s.getScreenNumber() == screenNumber) {
-					return s;
+			try {
+				Long screenNumber = Long.parseLong(input);
+				for (Screen s : theatre.getListOfScreen()) {
+					if (s.getScreenNumber() == screenNumber) {
+						return s;
+					}
 				}
+			}catch(NumberFormatException e) {
+				System.err.println("NumberFormatException");
 			}
 			System.err.println("Invalid input ");
 		}
@@ -182,15 +206,31 @@ public class TheatreAdminService {
 		}
 	}
 
+	private boolean isValidShowTime(Theatre theatre, Screen screen, long newShowStart, int newMovieDuration) {
+		for (Show s : theatre.getListOfShow()) {
+			if (s.getScreen().equals(screen)) {
+				long lastShowStart = s.getDateTimeEpoch();
+				long existingShowEnd = lastShowStart + (s.getMovie().getDuration() * 60) + (20 * 60);
+				if (newShowStart < existingShowEnd && newShowStart >= lastShowStart) {
+					return false;
+				}
+			}
+		}
+		return true;
+	}
+
 	private long getValidDateTime() {
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
 		while (true) {
 			System.out.print("Enter Show Date & Time (yyyy-MM-dd HH:mm): ");
 			String input = sc.nextLine();
-
 			try {
 				LocalDateTime dateTime = LocalDateTime.parse(input, formatter);
-				return dateTime.atZone(ZoneId.systemDefault()).toEpochSecond();
+				if (dateTime.isAfter(LocalDateTime.now())) {
+					return dateTime.atZone(ZoneId.systemDefault()).toEpochSecond();
+				} else {
+					System.out.println("Date/time must be in the future. Please try again.");
+				}
 			} catch (DateTimeParseException e) {
 				System.out.println("Invalid date/time format. Please try again.");
 			}
@@ -199,21 +239,120 @@ public class TheatreAdminService {
 
 	public void printShows(TheatreAdmin theatreAdmin, String timeZone) {
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm").withZone(ZoneId.of(timeZone));
-
-		System.out.println("+---------+--------------+--------------+-----------+-------------------+");
-		System.out.println("| Show ID | Theatre      | Movie        | Screen    | Date & Time       |");
-		System.out.println("+---------+--------------+--------------+-----------+-------------------+");
+		System.out.println(
+				"+---------+-------------------+---------------------------+-----------+----------------------+");
+		System.out.println(
+				"| Show ID | Theatre           | Movie                     | Screen    | Date & Time          |");
+		System.out.println(
+				"+---------+-------------------+---------------------------+-----------+----------------------+");
 
 		for (Map.Entry<Long, Show> entry : showDB.entrySet()) {
 			Show s = entry.getValue();
 			if (s.getTheatre().getTheatreId() == theatreAdmin.getTheatre().getTheatreId()) {
 				String dateTime = formatter.format(Instant.ofEpochSecond(s.getDateTimeEpoch()));
-				System.out.printf("| %-7d | %-12s | %-12s | %-9s | %-17s |\n", s.getShowId(),
+				System.out.printf("| %-7d | %-17s | %-22s | %-9s | %-20s |\n", s.getShowId(),
 						s.getTheatre().getTheatreName(), s.getMovie().getMovieTitle(), s.getScreen().getScreenNumber(),
 						dateTime);
 			}
 		}
-		System.out.println("+---------+--------------+--------------+-----------+-------------------+");
+		System.out.println(
+				"+---------+-------------------+---------------------------+-----------+----------------------+");
 	}
 
+	public void printShowFuture(TheatreAdmin theatreAdmin, String timeZone) {
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm").withZone(ZoneId.of(timeZone));
+		System.out.println(
+				"+---------+-------------------+---------------------------+-----------+----------------------+");
+		System.out.println(
+				"| Show ID | Theatre           | Movie                     | Screen    | Date & Time          |");
+		System.out.println(
+				"+---------+-------------------+---------------------------+-----------+----------------------+");
+
+		for (Map.Entry<Long, Show> entry : showDB.entrySet()) {
+			Show s = entry.getValue();
+			if (s.getTheatre().getTheatreId() == theatreAdmin.getTheatre().getTheatreId()
+					&& s.getDateTimeEpoch() > Instant.now().getEpochSecond()) {
+				String dateTime = formatter.format(Instant.ofEpochSecond(s.getDateTimeEpoch()));
+				System.out.printf("| %-7d | %-17s | %-22s | %-9s | %-20s |\n", s.getShowId(),
+						s.getTheatre().getTheatreName(), s.getMovie().getMovieTitle(), s.getScreen().getScreenNumber(),
+						dateTime);
+			}
+		}
+		System.out.println(
+				"+---------+-------------------+---------------------------+-----------+----------------------+");
+	}
+
+	public void printShowAllFuture(String timeZone) {
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm").withZone(ZoneId.of(timeZone));
+		System.out.println(
+				"+---------+-------------------+---------------------------+-----------+----------------------+");
+		System.out.println(
+				"| Show ID | Theatre           | Movie                     | Screen    | Date & Time          |");
+		System.out.println(
+				"+---------+-------------------+---------------------------+-----------+----------------------+");
+
+		for (Map.Entry<Long, Show> entry : showDB.entrySet()) {
+			Show s = entry.getValue();
+			if (s.getDateTimeEpoch() > Instant.now().getEpochSecond()) {
+				String dateTime = formatter.format(Instant.ofEpochSecond(s.getDateTimeEpoch()));
+				System.out.printf("| %-7d | %-17s | %-22s | %-9s | %-20s |\n", s.getShowId(),
+						s.getTheatre().getTheatreName(), s.getMovie().getMovieTitle(), s.getScreen().getScreenNumber(),
+						dateTime);
+			}
+		}
+		System.out.println(
+				"+---------+-------------------+---------------------------+-----------+----------------------+");
+	}
+
+	public void addScreen(TheatreAdmin theatreAdmin) {
+		Theatre thetare = theatreAdmin.getTheatre();
+
+		System.out.println("Enter the Number of Rows : ");
+		int row = Input.getInteger(15);
+		System.out.println("Enter the Number of columns : ");
+		int col = Input.getInteger(15);
+
+		thetare.addScreen(row, col);
+
+	}
+
+	public void addNewTheatre() {
+		long theatreId = theatreDB.size()+1;
+		 String theatreName,theatreLocation;
+		 System.out.print("Enter Theatre Name: ");
+		     theatreName = sc.nextLine().trim();
+		    while (theatreName.isEmpty()) {
+		        System.out.print("Theatre name cannot be empty. Enter again: ");
+		        theatreName = sc.nextLine().trim();
+		    }
+
+		    System.out.print("Enter Theatre Location: ");
+		     theatreLocation = sc.nextLine().trim();
+		    while (theatreLocation.isEmpty()) {
+		        System.out.print("Theatre location cannot be empty. Enter again: ");
+		        theatreLocation = sc.nextLine().trim();
+		    }
+		    
+		    ArrayList<Screen> screen = new ArrayList<>();
+		    int count =1;
+		    while(true) {
+		    	System.out.print("1 . Add Screen \n2 . Exit");
+		    	int currChoice=Input.getInteger(2);
+		    	if(currChoice==1) {
+		    		System.out.println("Enter the Number of row : ");
+			    	int row = Input.getInteger(15);
+			    	System.out.println("Enter the Number of col : ");
+			    	int col = Input.getInteger(15);
+			    	screen.add(new Screen(count,null,row,col));
+			    	count++;
+		    	}else {
+		    		break;
+		    	}
+		    	
+		    }
+		    
+		    theatreDB.put(theatreId, new Theatre(theatreId,theatreName,theatreLocation,screen,new ArrayList<>()));
+		    System.out.println("Theatre successfully Created and Theatre Id : "+theatreId);
+		
+	}
 }

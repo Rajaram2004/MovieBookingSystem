@@ -20,10 +20,6 @@ public class User {
 		this.userPreferredLocation = userPreferredLocation;
 		this.userPassword = userPassword;
 	}
-	
-	
-	
-
 	public Long getUserId() {
 		return userId;
 	}

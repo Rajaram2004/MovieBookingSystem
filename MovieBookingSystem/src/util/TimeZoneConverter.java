@@ -17,7 +17,7 @@ public class TimeZoneConverter {
 		int choice = 0;
 		while (choice < 1 || choice > timeZones.length) {
 			System.out.print("Enter choice (1-" + timeZones.length + "): ");
-			String input = sc.nextLine(); // read the full line
+			String input = sc.nextLine(); 
 			try {
 				choice = Integer.parseInt(input);
 			} catch (NumberFormatException e) {

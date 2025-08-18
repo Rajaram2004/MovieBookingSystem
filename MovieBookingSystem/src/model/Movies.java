@@ -23,6 +23,9 @@ public class Movies {
 		this.releaseYear = releaseYear;
 		this.listOfTheatre = listOfTheatre;
 	}
+	public void addTheatreToListOfThetare(Theatre theatre) {
+		listOfTheatre.add(theatre);
+	}
 	public int getReleaseYear() {
 		return releaseYear;
 	}

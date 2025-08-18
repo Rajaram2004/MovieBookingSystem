@@ -7,9 +7,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 import model.Movies;
@@ -26,6 +28,8 @@ public class AdminService {
 	static HashMap<Long, Movies> movieDB = InMemoryDatabase.getMovieDB();
 	static HashMap<Long, Theatre> theatreDB = InMemoryDatabase.getTheatreDB();
 	static HashMap<Long, Show> showDB = InMemoryDatabase.getShowDB();
+	TheatreService theatreServiceObj = new TheatreService();
+	TicketService ticketServiceObj = new TicketService();
 	List<String> validLanguages = Arrays.asList("Hindi", "English", "Tamil", "Telugu", "Bengali", "Marathi", "Gujarati",
 			"Urdu", "Kannada", "Malayalam");
 	private static final String LINE = "+-----+----------------------+---------------------------+-----------------+------+------------------------+-----------------+";
@@ -40,7 +44,6 @@ public class AdminService {
 			System.err.println("No users found in the system.");
 			return;
 		}
-
 		System.out.println(
 				"---------------------------------------------------------------------------------------------------------");
 		System.out.printf("| %-8s | %-20s | %-25s | %-15s | %-20s |%n", "User ID", "Name", "Email", "Phone",
@@ -52,9 +55,67 @@ public class AdminService {
 			System.out.printf("| %-8d | %-20s | %-25s | %-15d | %-20s |%n", user.getUserId(), user.getUserName(),
 					user.getUserEmailId(), user.getUserPhoneNumber(), user.getUserPreferredLocation());
 		}
-
 		System.out.println(
 				"---------------------------------------------------------------------------------------------------------");
+	}
+
+	public void editMovieDetails() {
+		ticketServiceObj.printAllMovies();
+		System.out.println("Enter the Movie Id : ");
+		Long movieId = Input.getLong((long) movieDB.size());
+		Movies movie = movieDB.get(movieId);
+		String[] editFeatures = { "1 . Change Movie Title", "2 . Change Movie Duration", "3 . Change Movie Genre",
+				"4 . Change Release Year", "5 . Exit" };
+		for (String edit : editFeatures) {
+			System.out.println(edit);
+		}
+		int choice = Input.getInteger(editFeatures.length);
+		switch (choice) {
+		case 1:
+			System.out.println("You Have Selected Change Movie Title");
+			System.out.println("Old Title : " + movie.getMovieTitle());
+			Scanner sc = Input.getScanner();
+			System.out.println("ENter the New Title : ");
+			String newTitle = sc.nextLine();
+			movie.setMovieTitle(newTitle);
+			System.out.println("Movie Title Changed");
+			break;
+		case 2:
+			System.out.println("You Have Selected Change Movie Duration");
+			int newDuration = Input.getInteger(500);
+			movie.setDuration(newDuration);
+			System.out.println("Movie Duration Changed");
+			break;
+		case 3:
+			System.out.println("You Have Selected Change Movie Genre");
+			HashSet<String> genres = new HashSet<>();
+			for (Movies movies : movieDB.values()) {
+				genres.add(movies.getGenre());
+			}
+			int count=1;
+			HashMap<Integer,String > getmap = new HashMap<>();
+			for(String str : genres) {
+				System.out.println(count + " "+str);
+				getmap.put(count, str);
+				count++;
+			}
+			System.out.println("Enter genre Number : ");
+			int genre = Input.getInteger(count-1);
+			movie.setGenre(getmap.get(genre));
+			System.out.println("Movie Genre Changed");
+			break;
+		case 4:
+			System.out.println("You Have Selected Change Release Year");
+			int newReleaseYear= Input.getInteger(2030);
+			movie.setReleaseYear(newReleaseYear);
+			System.out.println("Movie Release Year Changed");
+			break;
+		case 5:
+			System.out.println("You Have Selected Exit");
+			break;
+
+		}
+
 	}
 
 	public void searchUserByName() {
@@ -68,7 +129,6 @@ public class AdminService {
 			} else {
 				System.err.println("Invalid input please ReEnter the Name ");
 			}
-
 		}
 		System.out.println(
 				"---------------------------------------------------------------------------------------------------------");
@@ -199,7 +259,6 @@ public class AdminService {
 		while (movieDB.containsKey(movieId)) {
 			movieId++;
 		}
-
 		String title;
 		while (true) {
 			System.out.print("Enter Movie Title: ");
@@ -208,7 +267,6 @@ public class AdminService {
 				break;
 			System.err.println("Title cannot be empty. Please try again.");
 		}
-
 		int duration;
 		while (true) {
 			System.out.print("Enter Duration (in minutes): ");
@@ -222,7 +280,6 @@ public class AdminService {
 				System.err.println("Please enter a valid number for duration.");
 			}
 		}
-
 		final List<String> allowedGenres = Arrays.asList("Action", "Drama", "Thriller", "Comedy", "Historical");
 		String genre = null;
 		while (true) {
@@ -232,7 +289,6 @@ public class AdminService {
 			}
 			System.out.print("Enter choice (1-" + allowedGenres.size() + ") or type the genre: ");
 			String g = sc.nextLine().trim();
-
 			try {
 				int idx = Integer.parseInt(g);
 				if (idx >= 1 && idx <= allowedGenres.size()) {
@@ -253,9 +309,6 @@ public class AdminService {
 				System.err.println("Genre must be one of " + allowedGenres + ". Please try again.");
 			}
 		}
-
-		// Language
-
 		String language = null;
 		while (true) {
 			System.out.println("Choose a Language:");
@@ -264,8 +317,6 @@ public class AdminService {
 			}
 			System.out.print("Enter language (number or name): ");
 			String input = sc.nextLine().trim();
-
-			// Check if input is a number
 			if (input.matches("\\d+")) {
 				int choice = Integer.parseInt(input);
 				if (choice >= 1 && choice <= validLanguages.size()) {
@@ -273,13 +324,12 @@ public class AdminService {
 					break;
 				}
 			} else {
-				// Case-insensitive name check
 				boolean isValid = validLanguages.stream().anyMatch(lang -> lang.equalsIgnoreCase(input));
 
 				if (isValid) {
 					for (String lang : validLanguages) {
 						if (lang.equalsIgnoreCase(input)) {
-							language = lang; // Normalize
+							language = lang;
 							break;
 						}
 					}
@@ -289,8 +339,6 @@ public class AdminService {
 
 			System.err.println("Invalid choice. Please enter a number or valid language name.");
 		}
-
-		// Release Year
 		int releaseYear;
 		int currentYear = Calendar.getInstance().get(Calendar.YEAR);
 		while (true) {
@@ -346,7 +394,6 @@ public class AdminService {
 			}
 			System.err.println("Name cannot be empty. Please re-enter.");
 		}
-
 		String email;
 		while (true) {
 			System.out.print("Enter Theatre Admin Email: ");
@@ -368,8 +415,6 @@ public class AdminService {
 			}
 			System.err.println("Invalid phone number. Must be 10 digits.");
 		}
-
-		// Password validation
 		String password;
 		while (true) {
 			System.out.print("Enter Theatre Admin Password (min 6 chars): ");
@@ -380,9 +425,9 @@ public class AdminService {
 			}
 			System.err.println("Password must be at least 6 characters.");
 		}
-
 		Theatre theatre = null;
 		while (true) {
+			theatreServiceObj.printAllTheatres();
 			System.out.print("Enter Theatre ID to assign: ");
 			String input = sc.nextLine().trim();
 			try {
@@ -398,8 +443,6 @@ public class AdminService {
 				System.err.println("Invalid input. Enter a valid numeric Theatre ID.");
 			}
 		}
-
-		// Save admin
 		theatreAdminDB.put(admin.getTheatreAdminId(), admin);
 		System.out.println("Theatre Admin added successfully: " + admin.getTheatreAdminName());
 	}

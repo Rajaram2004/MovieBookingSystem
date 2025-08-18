@@ -2,11 +2,17 @@ package main;
 
 import model.Admin;
 import service.AdminService;
+import service.TheatreAdminService;
+import service.TheatreService;
+import service.TicketService;
 import util.Input;
 
 public class AdminOperations {
-	AdminOperations() {
+	static TicketService ticketServiceObj = new TicketService();
+	static TheatreService theatreServiceObj = new TheatreService();
+	static TheatreAdminService theatreAdminServiceObj = new TheatreAdminService();
 
+	AdminOperations() {
 	}
 
 	public static void adminOperations(Admin admin, String timeZone) {
@@ -59,6 +65,37 @@ public class AdminOperations {
 			adminOperations(admin, timeZone);
 			break;
 		case 10:
+			System.out.println("You Have Selected Print All Movies ");
+			ticketServiceObj.printAllMovies();
+			adminOperations(admin, timeZone);
+			break;
+		case 11:
+			System.out.println("You Have Selected Print All Theatres ");
+			theatreServiceObj.printAllTheatres();
+			adminOperations(admin, timeZone);
+			break;
+
+		case 12:
+			System.out.println("You Have Selected Search Show By Id ");
+			theatreAdminServiceObj.searchShowId(timeZone);
+			adminOperations(admin, timeZone);
+			break;
+		case 13:
+			System.out.println("You Have Selected Edit Movie Details ");
+			adminService.editMovieDetails();
+			adminOperations(admin, timeZone);
+			break;
+		case 14:
+			System.out.println("You Have Selected Edit Movie Details ");
+			theatreAdminServiceObj.printShowAllFuture(timeZone);
+			adminOperations(admin, timeZone);
+			break;
+		case 15:
+			System.out.println("You Have Selected Add New Theatre ");
+			theatreAdminServiceObj.addNewTheatre();
+			adminOperations(admin, timeZone);
+			break;
+		case 16:
 			System.out.println("You Have Selected Exit ");
 			int choice = MainMenu.mainMenu();
 			MainMenu.call(choice);
@@ -72,7 +109,9 @@ public class AdminOperations {
 
 		String[] features = { "1 . View All Users ", "2 . Search User By Id ", "3 . Search User By Name",
 				"4 . View All Theatre Admins", "5 . Search Theatre Admin By Id", "6 . Search Theatre Admin By Name",
-				"7 . add New Movie","8 . Add Theatre Admin ","9 . Print All Shows","10 . Exit" };
+				"7 . add New Movie", "8 . Add Theatre Admin ", "9 . Print All Shows", "10. Print All Movies",
+				"11. Print All Theatres ", "12. Search Show By Id", "13. Edit Movie Details",
+				"14. Display All Future Show", "15. Add New Theatre", "16. Exit" };
 
 		int n = features.length;
 		for (int i = 0; i < n; i++) {

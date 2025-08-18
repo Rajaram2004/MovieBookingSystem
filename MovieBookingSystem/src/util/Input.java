@@ -33,12 +33,12 @@ public class Input {
 		}
 	}
 	
-	public static long getLong(Long n) {
+	public static long getLong(Long maxValue) {
         while (true) {
             try {
                 String input = SCANNER.nextLine().trim();
                 Long num =  Long.parseLong(input);
-                if(num >0 && num <= n) {
+                if(num >0 && num <= maxValue) {
                 	return num;
                 }
                 	
