@@ -1,7 +1,9 @@
 package service;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 import java.util.Set;
@@ -20,24 +22,32 @@ public class MovieService {
 
 	public void searchByMovieName() {
 		Scanner sc = Input.getScanner();
-		System.out.print("Enter Movie Name : ");
+		System.out.print("Enter Movie Name (or Type 'done' to Exit): ");
 		String movieName = sc.nextLine();
+		if(movieName.equalsIgnoreCase("done")) {
+			System.out.println("------Back------");
+			return;
+		}
 		boolean found = false;
+		List<Movies> movieList=new ArrayList<>();
 		for (Movies m : movieDB.values()) {
-			if (m.getMovieTitle().equalsIgnoreCase(movieName)) {
+			if (m.getMovieTitle().toLowerCase().startsWith(movieName.toLowerCase())) {
 				found = true;
-				printSearchMovie(m);
-				break;
+				movieList.add(m);
+				
+				
 			}
 		}
 		if (!found) {
 			System.err.println("Movie not found or invalid. Please check the name and try again.");
 			printAllMovies();
 			searchByMovieName();
+		}else {
+			printSearchMovie(movieList);
 		}
 	}
 
-	public void printSearchMovie(Movies m) {
+	public void printSearchMovie(List<Movies> movieList) {
 
 		String format = "| %-4s | %-27s | %-10s | %-10s | %-10s | %-6s | %-32s |%n";
 		System.out.println(
@@ -45,16 +55,20 @@ public class MovieService {
 		System.out.format(format, "ID", "Title", "Duration", "Genre", "Language", "Year", "Theatres");
 		System.out.println(
 				"+------+-----------------------------+------------+------------+------------+--------+--------------------------------+");
-		String theatres = m.getListOfTheatre().stream().map(Theatre::getTheatreName).reduce((a, b) -> a + ", " + b)
-				.orElse("No Theatre");
-		int hours = m.getDuration() / 60;
-		int minutes = m.getDuration() % 60;
-		String durationFormatted = String.format("%d hr %02d min", hours, minutes);
-		if (theatres.length() > 30) {
-			theatres = theatres.substring(0, 27) + "...";
+		
+		for(Movies m : movieList) {
+			String theatres = m.getListOfTheatre().stream().map(Theatre::getTheatreName).reduce((a, b) -> a + ", " + b)
+					.orElse("No Theatre");
+			int hours = m.getDuration() / 60;
+			int minutes = m.getDuration() % 60;
+			String durationFormatted = String.format("%d hr %02d min", hours, minutes);
+			if (theatres.length() > 30) {
+				theatres = theatres.substring(0, 27) + "...";
+			}
+			System.out.format(format, m.getMovieId(), m.getMovieTitle(), durationFormatted, m.getGenre(), m.getLanguage(),
+					m.getReleaseYear(), theatres);
 		}
-		System.out.format(format, m.getMovieId(), m.getMovieTitle(), durationFormatted, m.getGenre(), m.getLanguage(),
-				m.getReleaseYear(), theatres);
+		
 
 		System.out.println(
 				"+------+-----------------------------+------------+------------+------------+--------+--------------------------------+");
@@ -89,7 +103,8 @@ public class MovieService {
 		for (Movies movie : movieDB.values()) {
 			genres.add(movie.getGenre());
 		}
-		System.out.println("Select a Genre:");
+		System.out.println("Select a Genre (or press 0 to exit):");
+		
 		int count = 1;
 		Map<Integer, String> genreMap = new HashMap<>();
 		for (String g : genres) {
@@ -97,19 +112,27 @@ public class MovieService {
 			genreMap.put(count, g);
 			count++;
 		}
+		System.out.println("Enter the Genre Number : ");
 		int selectedId = Input.getInteger(count - 1);
+		if(selectedId==0) {
+			System.out.println("------Back------");
+			return;
+		}
 		String selectedGenre = genreMap.get(selectedId);
 		System.out.println("Movies in Genre: " + selectedGenre);
-		System.out.println("+----+-----------------------------+--------+");
-		System.out.println("| ID | Title                       | Year   |");
-		System.out.println("+----+-----------------------------+--------+");
+		System.out.println("+----+-----------------------------+--------+----------------+");
+		System.out.println("| ID | Title                       | Year   | Language       |");
+		System.out.println("+----+-----------------------------+--------+----------------+");
 		for (Movies movie : movieDB.values()) {
-			if (movie.getGenre().equalsIgnoreCase(selectedGenre)) {
-				System.out.printf("| %-2d | %-27s | %-6d |\n", movie.getMovieId(), movie.getMovieTitle(),
-						movie.getReleaseYear());
-			}
+		    if (movie.getGenre().equalsIgnoreCase(selectedGenre)) {
+		        System.out.printf("| %-2d | %-27s | %-6d | %-14s |\n",
+		                movie.getMovieId(),
+		                movie.getMovieTitle(),
+		                movie.getReleaseYear(),
+		                movie.getLanguage());
+		    }
 		}
-		System.out.println("+----+-----------------------------+--------+");
+		System.out.println("+----+-----------------------------+--------+----------------+");
 	}
 
 }

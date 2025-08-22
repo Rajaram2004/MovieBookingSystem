@@ -7,18 +7,34 @@ public class User {
 	private Long userPhoneNumber;
 	private String userPreferredLocation;
 	private String userPassword;
+	private double balance;
+	private String timeZone;
     public User() {
 		
 	}
 	public User(Long userId, String userName, String userEmailId, Long userPhoneNumber, String userPreferredLocation,
-			String userPassword) {
-	
+			String userPassword, double balance, String timeZone) {
+		super();
 		this.userId = userId;
 		this.userName = userName;
 		this.userEmailId = userEmailId;
 		this.userPhoneNumber = userPhoneNumber;
 		this.userPreferredLocation = userPreferredLocation;
 		this.userPassword = userPassword;
+		this.balance = balance;
+		this.timeZone = timeZone;
+	}
+	public double getBalance() {
+		return balance;
+	}
+	public void setBalance(double balance) {
+		this.balance = balance;
+	}
+	public String getTimeZone() {
+		return timeZone;
+	}
+	public void setTimeZone(String timeZone) {
+		this.timeZone = timeZone;
 	}
 	public Long getUserId() {
 		return userId;
@@ -56,5 +72,4 @@ public class User {
 	public void setUserPassword(String userPassword) {
 		this.userPassword = userPassword;
 	}	
-	
 }

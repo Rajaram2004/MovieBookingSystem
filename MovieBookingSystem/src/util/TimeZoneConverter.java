@@ -15,17 +15,23 @@ public class TimeZoneConverter {
 			System.out.println((i + 1) + ". " + timeZones[i]);
 		}
 		int choice = 0;
-		while (choice < 1 || choice > timeZones.length) {
-			System.out.print("Enter choice (1-" + timeZones.length + "): ");
-			String input = sc.nextLine(); 
+		while (true) {
+			System.out.print("Enter choice (1-" + timeZones.length + ") (or Type 'done' to Exit): ");
+			String input = sc.nextLine();
+			if (input.equalsIgnoreCase("done")) {
+				System.out.println("------Back------");
+				return null;
+			}
+
 			try {
 				choice = Integer.parseInt(input);
+				if (choice > 0 && choice <= timeZones.length) {
+					return timeZones[choice - 1];
+				}
 			} catch (NumberFormatException e) {
 				System.err.println("Invalid Input ");
-				selectTimeZone(); 
 			}
 		}
 
-		return timeZones[choice - 1];
 	}
 }

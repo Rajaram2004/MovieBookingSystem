@@ -1,11 +1,18 @@
 package main;
 
+import java.util.List;
+
 import model.Admin;
+import model.Movies;
+import model.Show;
+import model.Theatre;
+import model.TheatreAdmin;
 import service.AdminService;
 import service.TheatreAdminService;
 import service.TheatreService;
 import service.TicketService;
 import util.Input;
+import util.TimeZoneConverter;
 
 public class AdminOperations {
 	static TicketService ticketServiceObj = new TicketService();
@@ -15,87 +22,108 @@ public class AdminOperations {
 	AdminOperations() {
 	}
 
-	public static void adminOperations(Admin admin, String timeZone) {
+	public static void adminOperations(Admin admin) {
 		int adminChoice = adminFeatures();
+		String timeZone = admin.getTimeZone();
 		AdminService adminService = new AdminService();
 		switch (adminChoice) {
+		case 0:
+			System.out.println("You Have Selected Exit ");
+			int choice0 = MainMenu.mainMenu();
+			MainMenu.call(choice0);
+			break;
 		case 1:
 			System.out.println("You Have Selected print All Bookings");
 			adminService.viewAllUsers();
-			adminOperations(admin, timeZone);
+			adminOperations(admin);
 			break;
 		case 2:
 			System.out.println("You Have Selected Search User By ID");
 			adminService.searchUserById();
-			adminOperations(admin, timeZone);
+			adminOperations(admin);
 			break;
 		case 3:
 			System.out.println("You Have Selected Search User By Name");
 			adminService.searchUserByName();
-			adminOperations(admin, timeZone);
+			adminOperations(admin);
 			break;
 		case 4:
 			System.out.println("You Have Selected View All Theatre Admins");
 			adminService.viewAllTheatreAdmins();
-			adminOperations(admin, timeZone);
+			adminOperations(admin);
 			break;
 		case 5:
 			System.out.println("You Have Selected Search Theatre AdminBy Id");
 			adminService.searchTheatreAdminById();
-			adminOperations(admin, timeZone);
+			adminOperations(admin);
 			break;
 		case 6:
 			System.out.println("You Have Selected Search Theatre Admin By Name");
 			adminService.searchTheatreAdminByName();
-			adminOperations(admin, timeZone);
+			adminOperations(admin);
 			break;
 		case 7:
 			System.out.println("You Have Selected Add New Movie");
 			adminService.addMovie();
-			adminOperations(admin, timeZone);
+			adminOperations(admin);
 			break;
 		case 8:
-			System.out.println("You Have Selected Add Theatre Admin ");
-			adminService.addTheatreAdmin();
-			adminOperations(admin, timeZone);
+			System.out.println("You Have Selected Seat Availability");
+			TheatreAdmin theatreAdmin = new TheatreAdmin();
+		
+			userDisplaySeatAvailability(ticketServiceObj,timeZone);
+			adminOperations(admin);
 			break;
 		case 9:
 			System.out.println("You Have Selected Print All Shows ");
 			adminService.printAllShows(timeZone);
-			adminOperations(admin, timeZone);
+			adminOperations(admin);
 			break;
 		case 10:
 			System.out.println("You Have Selected Print All Movies ");
 			ticketServiceObj.printAllMovies();
-			adminOperations(admin, timeZone);
+			adminOperations(admin);
 			break;
 		case 11:
 			System.out.println("You Have Selected Print All Theatres ");
 			theatreServiceObj.printAllTheatres();
-			adminOperations(admin, timeZone);
+			adminOperations(admin);
 			break;
 
 		case 12:
 			System.out.println("You Have Selected Search Show By Id ");
 			theatreAdminServiceObj.searchShowId(timeZone);
-			adminOperations(admin, timeZone);
+			adminOperations(admin);
 			break;
 		case 13:
 			System.out.println("You Have Selected Edit Movie Details ");
 			adminService.editMovieDetails();
-			adminOperations(admin, timeZone);
+			adminOperations(admin);
 			break;
 		case 14:
 			System.out.println("You Have Selected Edit Movie Details ");
 			theatreAdminServiceObj.printShowAllFuture(timeZone);
-			adminOperations(admin, timeZone);
+			adminOperations(admin);
 			break;
 		case 15:
-			System.out.println("You Have Selected Add New Theatre ");
-			theatreAdminServiceObj.addNewTheatre();
-			adminOperations(admin, timeZone);
+			System.out.println("You Have Selected Approve New Theatre ");
+			theatreAdminServiceObj.approveNewTheatre(admin);
+			adminOperations(admin);
 			break;
 		case 16:
+			System.out.println("You Have Selected Change Time Zone ");
+			timeZone = TimeZoneConverter.selectTimeZone();
+			if (timeZone != null) {
+				admin.setTimeZone(timeZone);
+				System.out.println("Time Zone Changed");
+			}
+			adminOperations(admin);
+			break;
+		case 17:
+			System.out.println("You Have Selected Add Theatre to Thate Admin ");
+			theatreAdminServiceObj.AddTheatreToTheatreAdmin();
+			adminOperations(admin);
+		case 18:
 			System.out.println("You Have Selected Exit ");
 			int choice = MainMenu.mainMenu();
 			MainMenu.call(choice);
@@ -109,9 +137,10 @@ public class AdminOperations {
 
 		String[] features = { "1 . View All Users ", "2 . Search User By Id ", "3 . Search User By Name",
 				"4 . View All Theatre Admins", "5 . Search Theatre Admin By Id", "6 . Search Theatre Admin By Name",
-				"7 . add New Movie", "8 . Add Theatre Admin ", "9 . Print All Shows", "10. Print All Movies",
+				"7 . add New Movie", "8 . Seat Availability ", "9 . Print All Shows", "10. Print All Movies",
 				"11. Print All Theatres ", "12. Search Show By Id", "13. Edit Movie Details",
-				"14. Display All Future Show", "15. Add New Theatre", "16. Exit" };
+				"14. Display All Future Show", "15. Approve New Theatre", "16. Change Time Zone",
+				"17. Add Theatre to Theatre Admin", "18. Exit" };
 
 		int n = features.length;
 		for (int i = 0; i < n; i++) {
@@ -119,8 +148,21 @@ public class AdminOperations {
 		}
 
 		System.out.println("\n===========================================================\n");
-		System.out.println("Enter Your Choice : ");
+		System.out.println("Please enter your choice (or press 0 to exit):");
 		return Input.getInteger(n);
+	}
+	public static void userDisplaySeatAvailability(TicketService ticketServiceObj, String timeZone) {
+		Movies movieObj = ticketServiceObj.selectMovie();
+		if(movieObj==null) return;
+		Theatre theatreObj = ticketServiceObj.selectTheatreForMovie(movieObj);
+		if(theatreObj==null) return;
+		List<Show> shows = ticketServiceObj.getShowsForMovieAndTheatre(movieObj, theatreObj);
+		Show show = ticketServiceObj.getShow(shows, timeZone);
+		if (show == null) {
+			System.err.println("cancelled. No show selected.");
+		} else {
+			ticketServiceObj.displaySeatsByCategory(show);
+		}
 	}
 
 }

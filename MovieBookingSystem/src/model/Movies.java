@@ -23,6 +23,16 @@ public class Movies {
 		this.releaseYear = releaseYear;
 		this.listOfTheatre = listOfTheatre;
 	}
+	public void removeTheare(Theatre theatre) {
+		int count=0;
+		for(Theatre t:listOfTheatre) {
+			if(t.getTheatreId()==theatre.getTheatreId()) {
+				break;
+			}
+			count++;
+		}
+		listOfTheatre.remove(count);
+	}
 	public void addTheatreToListOfThetare(Theatre theatre) {
 		listOfTheatre.add(theatre);
 	}

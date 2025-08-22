@@ -11,19 +11,21 @@ public class TheatreService {
 		
 	}
 	public void printAllTheatres() {
-	    System.out.println("+----+---------------------+------------+----------------+---------------------+");
-	    System.out.println("| ID | Theatre Name        | Location   | Number of Screens   | Number of Shows|");
-	    System.out.println("+----+---------------------+------------+----------------+---------------------+");
+	    System.out.println("+----+---------------------+------------+");
+	    System.out.println("| ID | Theatre Name        | Location   |");
+	    System.out.println("+----+---------------------+------------+");
 
 	    for (Theatre theatre : theatreDB.values()) {
-	        System.out.printf("| %-2d | %-19s | %-10s | %-14d | %-14d     |\n",
-	                theatre.getTheatreId(),
-	                theatre.getTheatreName(),
-	                theatre.getTheatreLocation(),
-	                theatre.getListOfScreen().size(),
-	                theatre.getListOfShow().size());
+	    	if(theatre.isActive()==true) {
+	    		System.out.printf("| %-2d | %-19s | %-10s |\n",
+		                theatre.getTheatreId(),
+		                theatre.getTheatreName(),
+		                theatre.getTheatreLocation());
+	    	}
+	        
+	                
 	    }
-	    System.out.println("+----+---------------------+------------+----------------+---------------------+");
+	    System.out.println("+----+---------------------+------------+");
 	}
 
 }

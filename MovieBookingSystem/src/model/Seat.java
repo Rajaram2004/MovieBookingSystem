@@ -17,6 +17,9 @@ public class Seat {
 		this.seatPrice = seatPrice;
 		this.seatStatus = seatStatus;
 	}
+	public Seat() {
+		// TODO Auto-generated constructor stub
+	}
 	public double getSeatPrice() {
 		return seatPrice;
 	}

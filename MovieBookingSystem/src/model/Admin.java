@@ -6,13 +6,24 @@ public class Admin {
 	private String adminEmailId;
 	private Long adminPhoneNumber;
 	private String adminPassword;
-	public Admin(Long adminId, String adminName, String adminEmailId, Long adminPhoneNumber, String adminPassword) {
+	private String timeZone;
+	
+	
+	public Admin(Long adminId, String adminName, String adminEmailId, Long adminPhoneNumber, String adminPassword,
+			String timeZone) {
 		super();
 		this.adminId = adminId;
 		this.adminName = adminName;
 		this.adminEmailId = adminEmailId;
 		this.adminPhoneNumber = adminPhoneNumber;
 		this.adminPassword = adminPassword;
+		this.timeZone = timeZone;
+	}
+	public String getTimeZone() {
+		return timeZone;
+	}
+	public void setTimeZone(String timeZone) {
+		this.timeZone = timeZone;
 	}
 	public Long getAdminId() {
 		return adminId;

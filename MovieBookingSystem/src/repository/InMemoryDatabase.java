@@ -11,6 +11,7 @@ import java.util.Random;
 
 import model.Admin;
 import model.Movies;
+import model.RequestTheatre;
 import model.Screen;
 import model.Seat;
 import model.Show;
@@ -27,24 +28,28 @@ public class InMemoryDatabase {
 	static HashMap<Long,Movies> movieDB = new HashMap<>();
 	static HashMap<Long,Show> showDB = new HashMap<>();
 	static HashMap<Long,Ticket> ticketDB =new HashMap<>();
+	static HashMap<Long,RequestTheatre> RequestTheatreDB =new HashMap<>();
+
+
+
 
 
 	public InMemoryDatabase() {
 		userDB = InMemoryDatabase.getUserDB();
-		userDB.put(1L, new User(1L, "User 1", "user1@example.com", 987654321L, "Chennai", "pass123"));
-		userDB.put(2L, new User(2L, "User 2", "user2@example.com", 123456789L, "Bangalore", "pass456"));
-		userDB.put(3L, new User(3L, "User 3", "user3@example.com", 912345678L, "Mumbai", "pass789"));
-		userDB.put(4L, new User(4L, "User 4", "user4@example.com", 123456L, "Mumbai", "1"));
+		userDB.put(1L, new User(1L, "User 1", "user1@example.com", 987654321L, "Chennai", "pass123",2000,"Asia/Kolkata"));
+		userDB.put(2L, new User(2L, "User 2", "user2@example.com", 123456789L, "Bangalore", "pass456",20000,"Asia/Kolkata"));
+		userDB.put(3L, new User(3L, "User 3", "user3@example.com", 912345678L, "Mumbai", "pass789",20000,"Asia/Kolkata"));
+		userDB.put(4L, new User(4L, "User 4", "user4@example.com", 123456L, "Mumbai", "1",20000,"Asia/Kolkata"));
 
 		Theatre t = null;
 
-		theatreAdminDB.put(1L, new TheatreAdmin(1L, "Admin One", "theatreadmin1@example.com", 987654321L, "pass123", t));
-		theatreAdminDB.put(2L, new TheatreAdmin(2L, "Admin Two", "theatreadmin2@example.com", 123456789L, "pass456", t));
-		theatreAdminDB.put(3L, new TheatreAdmin(3L, "Admin Three", "theatreadmin3@example.com", 912345678L, "pass789", t));
+		theatreAdminDB.put(1L, new TheatreAdmin(1L, "Admin One", "theatreadmin1@example.com", 987654321L, "pass123", new ArrayList<>(),"Asia/Kolkata"));
+		theatreAdminDB.put(2L, new TheatreAdmin(2L, "Admin Two", "theatreadmin2@example.com", 123456789L, "pass456", new ArrayList<>(),"Asia/Kolkata"));
+		theatreAdminDB.put(3L, new TheatreAdmin(3L, "Admin Three", "theatreadmin3@example.com", 912345678L, "pass789", new ArrayList<>(),"Asia/Kolkata"));
 
-		adminDB.put(1L, new Admin(1L, "Rajaram", "admin1@example.com", 987654321L, "pass123"));
-		adminDB.put(2L, new Admin(2L, "Priya", "admin2@example.com", 123456789L, "pass456"));
-		adminDB.put(3L, new Admin(3L, "Arjun", "admin3@example.com", 912345678L, "pass789"));
+		adminDB.put(1L, new Admin(1L, "Rajaram", "admin1@example.com", 987654321L, "pass123","Asia/Kolkata"));
+		adminDB.put(2L, new Admin(2L, "Priya", "admin2@example.com", 123456789L, "pass456","Asia/Kolkata"));
+		adminDB.put(3L, new Admin(3L, "Arjun", "admin3@example.com", 912345678L, "pass789","Asia/Kolkata"));
 		
 		initializeMoviesAndTheatres();
 	}
@@ -186,13 +191,13 @@ public class InMemoryDatabase {
 	        "Bangalore", "Chennai", "Chennai", "Chennai", "Chennai"
 	    };
 
-	    List<Theatre> theatres = new ArrayList<>();
+	    List<Theatre> theatres = new ArrayList<>();     //Theatre with 3 screen
 	    for (int t = 0; t < theatreNames.length; t++) {
 	        List<Screen> screens = new ArrayList<>();
 	        for (int s = 1; s <= 3; s++) {
 	            screens.add(new Screen(s, null, 10, 12));
 	        }
-	        Theatre theatre = new Theatre(1L + t, theatreNames[t], theatreCities[t], screens, new ArrayList<>());
+	        Theatre theatre = new Theatre(1L + t, theatreNames[t], theatreCities[t], screens, new ArrayList<>(),true);
 	        theatres.add(theatre);
 	        theatreDB.put((long) (t + 1), theatre);
 	    }
@@ -219,7 +224,7 @@ public class InMemoryDatabase {
 
 	    List<Movies> movies = new ArrayList<>();
 	    Random rand = new Random();
-	    for (int m = 0; m < movieTitles.length; m++) {
+	    for (int m = 0; m < movieTitles.length; m++) {   //movies
 	        int numTheatres = 2 + rand.nextInt(3); 
 	        List<Theatre> movieTheatres = new ArrayList<>();
 	        while (movieTheatres.size() < numTheatres) {
@@ -257,9 +262,15 @@ public class InMemoryDatabase {
 	            }
 	        }
 	    }
-	    theatreAdminDB.get(1L).setTheatre(theatreDB.get(1L));
-	    theatreAdminDB.get(2L).setTheatre(theatreDB.get(2L));
-	    theatreAdminDB.get(3L).setTheatre(theatreDB.get(3L));
+	    
+	    theatreAdminDB.get(1L).addTheatre(theatreDB.get(1L));
+	    theatreAdminDB.get(1L).addTheatre(theatreDB.get(2L));
+	    
+	    theatreAdminDB.get(2L).addTheatre(theatreDB.get(3L));
+	    theatreAdminDB.get(2L).addTheatre(theatreDB.get(4L));
+	    
+	    theatreAdminDB.get(3L).addTheatre(theatreDB.get(5L));
+	    theatreAdminDB.get(3L).addTheatre(theatreDB.get(6L));
 	    
 	}
 
@@ -300,12 +311,16 @@ public class InMemoryDatabase {
 	public static void setShowDB(HashMap<Long, Show> showDB) {
 		InMemoryDatabase.showDB = showDB;
 	}
-
 	public static HashMap<Long, Ticket> getTicketDB() {
 		return ticketDB;
 	}
 	public static void setTicketDB(HashMap<Long, Ticket> ticketDB) {
 		InMemoryDatabase.ticketDB = ticketDB;
 	}
-	
+	public static HashMap<Long, RequestTheatre> getRequestTheatreDb() {
+		return RequestTheatreDB;
+	}
+	public static void setRequestTheatreDb(HashMap<Long, RequestTheatre> requestTheatreDb) {
+		RequestTheatreDB = requestTheatreDb;
+	}
 }

@@ -11,12 +11,11 @@ public class Ticket {
 	private List<Seat> seats;
 	private int bookingDateEpoch;
 	private double totalAmount;
-	private boolean isActive;
-	private boolean isComplete;
+	private String status;
+	
 	 
 	public Ticket(Long ticketId, User user, Movies movie, Theatre theatre, Show show, List<Seat> seats,
-			int bookingDateEpoch, double totalAmount, boolean isActive, boolean isComplete) {
-		super();
+			int bookingDateEpoch, double totalAmount, String status ) {
 		this.ticketId = ticketId;
 		this.user = user;
 		this.movie = movie;
@@ -25,8 +24,7 @@ public class Ticket {
 		this.seats = seats;
 		this.bookingDateEpoch = bookingDateEpoch;
 		this.totalAmount = totalAmount;
-		this.isActive = isActive;
-		this.isComplete = isComplete;
+		this.status=status;
 	}
 	public Show getShow() {
 		return show;
@@ -76,17 +74,11 @@ public class Ticket {
 	public void setTotalAmount(double totalAmount) {
 		this.totalAmount = totalAmount;
 	}
-	public boolean isActive() {
-		return isActive;
+	public String getStatus() {
+		return status;
 	}
-	public void setActive(boolean isActive) {
-		this.isActive = isActive;
-	}
-	public boolean isComplete() {
-		return isComplete;
-	}
-	public void setComplete(boolean isComplete) {
-		this.isComplete = isComplete;
+	public void setStatus(String status) {
+		this.status = status;
 	}
 	
 }

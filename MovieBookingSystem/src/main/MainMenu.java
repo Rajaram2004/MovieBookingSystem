@@ -8,6 +8,7 @@ import model.TheatreAdmin;
 import model.Ticket;
 import model.User;
 import repository.InMemoryDatabase;
+import service.AdminService;
 import service.MovieService;
 import service.TheatreService;
 import service.TicketService;
@@ -29,28 +30,43 @@ public class MainMenu {
 	public static void call(int choice) {
 
 		switch (choice) {
+		case 0:
+			System.out.println("You Have Selected Exit , Thank You");
+			System.exit(0);
+			break;
 		case 1:
-			String timeZone = TimeZoneConverter.selectTimeZone();
+
 			User user = null;
 			int num1 = printloginRegister();
 			if (num1 == 1) {
 				user = callUser();
-			} else if (num1 == 2) {
-				user = createNewUser();
-			}
-			Operations.operation(user, ticketServiceObj, movieServiceObj, theatreService, timeZone, ticketDB);
 
+			} else if (num1 == 2) {
+				createNewUser();
+				user = callUser();
+			}
+			if (user == null) {
+				Start();
+			} else {
+				String timeZone = user.getTimeZone();
+				Operations.operation(user, ticketServiceObj, movieServiceObj, theatreService, ticketDB);
+			}
 			break;
 		case 2:
-			String timeZone2 = TimeZoneConverter.selectTimeZone();
-			TheatreAdmin theatreAdmin = callTheatreAdmin();
-			TheatreAdminOperations.theatreAminOperations(theatreAdmin,timeZone2);
-
+			TheatreAdmin theatreAdmin = callTheatreAdminLoginOrRegister();
+			if (theatreAdmin == null) {
+				Start();
+			} else {
+				TheatreAdminOperations.theatreAminOperations(theatreAdmin);
+			}
 			break;
 		case 3:
-			String timeZone3 = TimeZoneConverter.selectTimeZone();
 			Admin admin = callAdmin();
-			AdminOperations.adminOperations(admin, timeZone3);
+			if (admin == null) {
+				Start();
+			} else {
+				AdminOperations.adminOperations(admin);
+			}
 			break;
 		case 4:
 			System.out.println("You Have Selected Exit , Thank You");
@@ -61,65 +77,30 @@ public class MainMenu {
 
 	public static Admin callAdmin() {
 
-		System.out.println("========================================");
-		System.out.println("|            🎬 User Login 🎬          |");
-		System.out.println("========================================");
-		System.out.println("|	1. login via phone Number      |");
-		System.out.println("|	2. login via Email Address     |");
-		System.out.println("========================================");
-		System.out.println("Enter Your Choice : ");
-		int choice = Input.getInteger(2);
 		Scanner sc = Input.getScanner();
 		HashMap<Long, Admin> AdminDB = InMemoryDatabase.getAdminDB();
 		Admin foundUser = null;
-		if (choice == 1) {
-			
-			while (true) {
-				System.out.print("Enter Your Phone Number (6–12 digits): ");
-				String input = sc.nextLine().trim();
-
-				if (input.matches("\\d{6,12}")) {
-					for (Admin u : AdminDB.values()) {
-						if (String.valueOf(u.getAdminPhoneNumber()).equals(input)) {
-							foundUser = u;
-							break;
-						}
-					}
-					if (foundUser == null) {
-						System.err.println(" Phone number not found!");
-					} else {
-						break;
-					}
-				} else {
-					System.err.println("Invalid input! Please enter 6–12 digits only.");
+		boolean flag = false;
+		while (true) {
+			System.out.println("Please Enter your Phone Number or Email (or press 0 to exit): ");
+			String input = sc.nextLine().trim();
+			if (input.equalsIgnoreCase("0")) {
+				return null; // exit
+			}
+			for (Admin u : AdminDB.values()) {
+				if (String.valueOf(u.getAdminPhoneNumber()).equals(input)
+						|| u.getAdminEmailId().equalsIgnoreCase(input)) {
+					foundUser = u;
+					flag = true;
+					break;
 				}
 			}
-
-		
-
-		} else if (choice == 2) {
-			while (true) {
-				System.out.print("Enter Your Email Address: ");
-				String email = sc.nextLine().trim();
-
-				if (email.matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$")) {
-					boolean found = false;
-					for (Admin u : AdminDB.values()) {
-						if (u.getAdminEmailId().equalsIgnoreCase(email)) {
-							found = true;
-							foundUser = u;
-							break;
-						}
-					}
-					if (!found) {
-						System.err.println("Invalid Email Address");
-					} else {
-						break;
-					}
-				} else {
-					System.err.println("Invalid Email Format! Example: user@example.com");
-				}
+			if (flag == true) {
+				break;
+			} else {
+				System.err.println("Invalid Phone Number or Emial");
 			}
+
 		}
 
 		while (true) {
@@ -138,67 +119,35 @@ public class MainMenu {
 		return foundUser;
 	}
 
-	private static User callUser() {
+	private static User callUser() { // 0
 
-		System.out.println("========================================");
-		System.out.println("|            🎬 User Login 🎬          |");
-		System.out.println("========================================");
-		System.out.println("|	1. login via phone Number      |");
-		System.out.println("|	2. login via Email Address     |");
-		System.out.println("========================================");
-		System.out.println("Enter Your Choice : ");
-		int choice = Input.getInteger(2);
-		Long PhoneNumber;
-
+		System.out.println("-----------------------------------------------------------------");
+		System.out.println("|                        Login                                   |");
+		System.out.println("-----------------------------------------------------------------");
 		Scanner sc = Input.getScanner();
 		HashMap<Long, User> userDB = InMemoryDatabase.getUserDB();
-		System.out.println(userDB);
 		User foundUser = null;
-		if (choice == 1) {
-			while (true) {
-				System.out.print("Enter Your Phone Number (6–12 digits): ");
-				String input = sc.nextLine().trim();
+		boolean flag = false;
+		while (true) {
+			System.out.print("Enter Your Phone Number or Email Id (or type '0' to Exit): ");
+			String input = sc.nextLine().trim();
+			if (input.equalsIgnoreCase("0")) {
+				return null;
+			}
+			for (User u : userDB.values()) {
+				if (String.valueOf(u.getUserPhoneNumber()).equals(input)
+						|| u.getUserEmailId().equalsIgnoreCase(input)) {
+					flag = true;
+					foundUser = u;
+					break;
 
-				if (input.matches("\\d{6,12}")) {
-					for (User u : userDB.values()) {
-						if (String.valueOf(u.getUserPhoneNumber()).equals(input)) {
-							foundUser = u;
-							break;
-						}
-					}
-					if (foundUser == null) {
-						System.err.println(" Phone number not found!");
-					} else {
-						break; 
-					}
-				} else {
-					System.err.println("Invalid input! Please enter 6–12 digits only.");
 				}
 			}
+			if (flag == true)
+				break;
+			else
+				System.err.println("Invalid Phone Number or Email Id");
 
-		} else if (choice == 2) {
-			while (true) {
-				System.out.print("Enter Your Email Address: ");
-				String email = sc.nextLine().trim();
-
-				if (email.matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$")) {
-					boolean found = false;
-					for (User u : userDB.values()) {
-						if (u.getUserEmailId().equalsIgnoreCase(email)) {
-							found = true;
-							foundUser = u;
-							break;
-						}
-					}
-					if (!found) {
-						System.err.println("Invalid Email Address");
-					} else {
-						break;
-					}
-				} else {
-					System.err.println("Invalid Email Format! Example: user@example.com");
-				}
-			}
 		}
 
 		while (true) {
@@ -215,6 +164,7 @@ public class MainMenu {
 		}
 
 		return foundUser;
+
 	}
 
 	public static int printloginRegister() {
@@ -229,69 +179,55 @@ public class MainMenu {
 
 	}
 
+	private static TheatreAdmin callTheatreAdminLoginOrRegister() {
+		AdminService adminService = new AdminService();
+		System.out.println("========================================");
+		System.out.println("|     🎬 Theatre Admin  🎬          |");
+		System.out.println("========================================");
+		System.out.println("|	1. login                          |");
+		System.out.println("|	2. Register                     |");
+		System.out.println("========================================");
+		System.out.println("Please enter your choice (or press 0 to exit): ");
+		int choice = Input.getInteger(2);
+		if (choice == 0) {
+			System.out.println("---Back---");
+		} else if (choice == 1) {
+			return callTheatreAdmin();
+		} else if (choice == 2) {
+			adminService.addTheatreAdmin();
+			return callTheatreAdmin();
+		}
+		return null;
+	}
+
 	private static TheatreAdmin callTheatreAdmin() {
 
 		System.out.println("========================================");
 		System.out.println("|     🎬 Theatre Admin Login 🎬          |");
 		System.out.println("========================================");
-		System.out.println("|	1. login via phone Number      |");
-		System.out.println("|	2. login via Email Address     |");
-		System.out.println("========================================");
-		System.out.println("Enter Your Choice : ");
-		int choice = Input.getInteger(2);
-		int PhoneNumber;
 
 		Scanner sc = Input.getScanner();
 		HashMap<Long, TheatreAdmin> theatreDb = InMemoryDatabase.getTheatreAdminDB();
 
 		TheatreAdmin foundAdmin = null;
-		if (choice == 1) {
-			while (true) {
-				System.out.print("Enter Your Phone Number (6–12 digits): ");
-				String input = sc.nextLine().trim();
 
-				if (input.matches("\\d{6,12}")) {
-					for (TheatreAdmin u : theatreDb.values()) {
-						if (String.valueOf(u.getTheatreAdminPhoneNumber()).equals(input)) {
-							foundAdmin = u;
-							break;
-						}
-					}
-					if (foundAdmin == null) {
-						System.err.println(" Phone number not found!");
-					} else {
-						break;
-					}
-				} else {
-					System.err.println("Invalid input! Please enter 6–12 digits only.");
+		
+		boolean found =false;
+		while(true) {
+			System.out.println("Enter your Phone Number or Email Id (or type 'o' to Exit");
+			String input = sc.nextLine().trim();
+			if(input.equalsIgnoreCase("0")) return null;
+			for (TheatreAdmin u : theatreDb.values()) {
+				if (String.valueOf(u.getTheatreAdminPhoneNumber()).equals(input)
+						|| u.getTheatreAdminEmailId().equalsIgnoreCase(input)) {
+					foundAdmin = u;
+					found = true;
+					break;
+
 				}
 			}
-
-
-		} else if (choice == 2) {
-			System.out.println(theatreDb);
-			while (true) {
-				System.out.print("Enter Your Email Address: ");
-				String email = sc.nextLine().trim();
-
-				if (email.matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$")) {
-					boolean found = false;
-					for (TheatreAdmin u : theatreDb.values()) {
-						if (u.getTheatreAdminEmailId().equalsIgnoreCase(email)) {
-							found = true;
-							foundAdmin = u;
-							break;
-						}
-					}
-					if (!found) {
-						System.err.println("Invalid Email Address");
-					} else {
-						break;
-					}
-				} else {
-					System.err.println("Invalid Email Format! Example: user@example.com");
-				}
-			}
+			if(found == true)break;
+			else System.err.println("Invalid Phoone Number or Email Id");
 		}
 
 		while (true) {
@@ -338,7 +274,7 @@ public class MainMenu {
 		}
 	}
 
-	public static User createNewUser() {
+	public static void createNewUser() {
 		Scanner sc = Input.getScanner();
 		HashMap<Long, User> userDB = InMemoryDatabase.getUserDB();
 
@@ -424,9 +360,15 @@ public class MainMenu {
 						"Password must be at least 6 characters, contain 1 uppercase, 1 number, and 1 special character.");
 			}
 		}
+		System.out.println("Enter the Amount : ");
+		int amount = Input.getInteger(1000000000);
+
+		String timeZone = TimeZoneConverter.selectTimeZone();
+		newUser.setBalance((double) amount);
+		newUser.setTimeZone(timeZone);
 		userDB.put(newUser.getUserId(), newUser);
 		System.out.println(" User Registered Successfully! ");
-		return newUser;
+
 	}
 
 }
