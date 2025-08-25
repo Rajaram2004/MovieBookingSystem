@@ -7,6 +7,7 @@ import model.Movies;
 import model.Show;
 import model.Theatre;
 import model.TheatreAdmin;
+import repository.InMemoryDatabase;
 import service.AdminService;
 import service.TheatreAdminService;
 import service.TheatreService;
@@ -26,6 +27,8 @@ public class AdminOperations {
 		int adminChoice = adminFeatures();
 		String timeZone = admin.getTimeZone();
 		AdminService adminService = new AdminService();
+		InMemoryDatabase.changeShowStatus();
+		ticketServiceObj.changeTicketStatus();
 		switch (adminChoice) {
 		case 0:
 			System.out.println("You Have Selected Exit ");
@@ -69,8 +72,6 @@ public class AdminOperations {
 			break;
 		case 8:
 			System.out.println("You Have Selected Seat Availability");
-			TheatreAdmin theatreAdmin = new TheatreAdmin();
-		
 			userDisplaySeatAvailability(ticketServiceObj,timeZone);
 			adminOperations(admin);
 			break;
@@ -124,6 +125,14 @@ public class AdminOperations {
 			theatreAdminServiceObj.AddTheatreToTheatreAdmin();
 			adminOperations(admin);
 		case 18:
+			System.out.println("You Have Selected Display all Ticket");
+			theatreAdminServiceObj.displayAllTicket(admin.getTimeZone());
+			adminOperations(admin);
+		case 19:
+			System.out.println("You Have Selected Display all Running Show");
+			theatreAdminServiceObj.displayAllRunningShow(admin.getTimeZone());
+			adminOperations(admin);
+		case 20:
 			System.out.println("You Have Selected Exit ");
 			int choice = MainMenu.mainMenu();
 			MainMenu.call(choice);
@@ -140,7 +149,7 @@ public class AdminOperations {
 				"7 . add New Movie", "8 . Seat Availability ", "9 . Print All Shows", "10. Print All Movies",
 				"11. Print All Theatres ", "12. Search Show By Id", "13. Edit Movie Details",
 				"14. Display All Future Show", "15. Approve New Theatre", "16. Change Time Zone",
-				"17. Add Theatre to Theatre Admin", "18. Exit" };
+				"17. Add Theatre to Theatre Admin", "18. Display all Ticket","19. Display All Running Show","20. Exit" };
 
 		int n = features.length;
 		for (int i = 0; i < n; i++) {

@@ -3,23 +3,19 @@ package model;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TheatreAdmin {
-	private Long theatreAdminId;
-	private String theatreAdminName;
-	private String theatreAdminEmailId;
-	private Long theatreAdminPhoneNumber;
-	private String theatreAdminPassword;
+public class TheatreAdmin extends UserDetails{
+	
 	private List<Theatre> theatre;
-	private String timeZone;
+	
 	
 	public TheatreAdmin(Long theatreAdminId, String theatreAdminName, String theatreAdminEmailId,
 			Long theatreAdminPhoneNumber, String theatreAdminPassword, List<Theatre> theatre, String timeZone) {
 		super();
-		this.theatreAdminId = theatreAdminId;
-		this.theatreAdminName = theatreAdminName;
-		this.theatreAdminEmailId = theatreAdminEmailId;
-		this.theatreAdminPhoneNumber = theatreAdminPhoneNumber;
-		this.theatreAdminPassword = theatreAdminPassword;
+		this.Id = theatreAdminId;
+		this.Name = theatreAdminName;
+		this.EmailId = theatreAdminEmailId;
+		this.PhoneNumber = theatreAdminPhoneNumber;
+		this.Password = theatreAdminPassword;
 		this.theatre = theatre;
 		this.timeZone = timeZone;
 	}
@@ -33,34 +29,34 @@ public class TheatreAdmin {
 		
 	}
 	public String getTheatreAdminName() {
-		return theatreAdminName;
+		return Name;
 	}
 	public void setTheatreAdminName(String theatreAdminName) {
-		this.theatreAdminName = theatreAdminName;
+		this.Name = theatreAdminName;
 	}
 	public Long getTheatreAdminId() {
-		return theatreAdminId;
+		return Id;
 	}
 	public void setTheatreAdminId(Long theatreAdminId) {
-		this.theatreAdminId = theatreAdminId;
+		this.Id = theatreAdminId;
 	}
 	public String getTheatreAdminEmailId() {
-		return theatreAdminEmailId;
+		return EmailId;
 	}
 	public void setTheatreAdminEmailId(String theatreAdminEmailId) {
-		this.theatreAdminEmailId = theatreAdminEmailId;
+		this.EmailId = theatreAdminEmailId;
 	}
 	public Long getTheatreAdminPhoneNumber() {
-		return theatreAdminPhoneNumber;
+		return PhoneNumber;
 	}
 	public void setTheatreAdminPhoneNumber(Long theatreAdminPhoneNumber) {
-		this.theatreAdminPhoneNumber = theatreAdminPhoneNumber;
+		this.PhoneNumber = theatreAdminPhoneNumber;
 	}
 	public String getTheatreAdminPassword() {
-		return theatreAdminPassword;
+		return Password;
 	}
 	public void setTheatreAdminPassword(String theatreAdminPassword) {
-		this.theatreAdminPassword = theatreAdminPassword;
+		this.Password = theatreAdminPassword;
 	}
 	public List<Theatre> getTheatre() {
 		return theatre;

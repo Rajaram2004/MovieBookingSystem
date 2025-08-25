@@ -1,26 +1,21 @@
 package model;
 
-public class User {
-	private Long userId;
-	private String userName;
-	private String userEmailId;
-	private Long userPhoneNumber;
-	private String userPreferredLocation;
-	private String userPassword;
+public class User extends UserDetails{
+	
+	private String PreferredLocation;
 	private double balance;
-	private String timeZone;
     public User() {
 		
 	}
 	public User(Long userId, String userName, String userEmailId, Long userPhoneNumber, String userPreferredLocation,
 			String userPassword, double balance, String timeZone) {
 		super();
-		this.userId = userId;
-		this.userName = userName;
-		this.userEmailId = userEmailId;
-		this.userPhoneNumber = userPhoneNumber;
-		this.userPreferredLocation = userPreferredLocation;
-		this.userPassword = userPassword;
+		this.Id = userId;
+		this.Name = userName;
+		this.EmailId = userEmailId;
+		this.PhoneNumber = userPhoneNumber;
+		this.PreferredLocation = userPreferredLocation;
+		this.Password = userPassword;
 		this.balance = balance;
 		this.timeZone = timeZone;
 	}
@@ -37,39 +32,39 @@ public class User {
 		this.timeZone = timeZone;
 	}
 	public Long getUserId() {
-		return userId;
+		return Id;
 	}
 	public void setUserId(Long userId) {
-		this.userId = userId;
+		this.Id = userId;
 	}
 	public String getUserName() {
-		return userName;
+		return Name;
 	}
 	public void setUserName(String userName) {
-		this.userName = userName;
+		this.Name = userName;
 	}
 	public String getUserEmailId() {
-		return userEmailId;
+		return EmailId;
 	}
 	public void setUserEmailId(String userEmailId) {
-		this.userEmailId = userEmailId;
+		this.EmailId = userEmailId;
 	}
 	public Long getUserPhoneNumber() {
-		return userPhoneNumber;
+		return PhoneNumber;
 	}
 	public void setUserPhoneNumber(Long userPhoneNumber) {
-		this.userPhoneNumber = userPhoneNumber;
+		this.PhoneNumber = userPhoneNumber;
 	}
 	public String getUserPreferredLocation() {
-		return userPreferredLocation;
+		return PreferredLocation;
 	}
 	public void setUserPreferredLocation(String userPreferredLocation) {
-		this.userPreferredLocation = userPreferredLocation;
+		this.PreferredLocation = userPreferredLocation;
 	}
 	public String getUserPassword() {
-		return userPassword;
+		return Password;
 	}
 	public void setUserPassword(String userPassword) {
-		this.userPassword = userPassword;
+		this.Password = userPassword;
 	}	
 }

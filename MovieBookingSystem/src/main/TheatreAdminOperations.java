@@ -6,6 +6,7 @@ import model.Movies;
 import model.Show;
 import model.Theatre;
 import model.TheatreAdmin;
+import repository.InMemoryDatabase;
 import service.TheatreAdminService;
 import service.TicketService;
 import util.Input;
@@ -18,6 +19,8 @@ public class TheatreAdminOperations {
 		TheatreAdminService theatreAdminService = new TheatreAdminService();
 		int choice = theatreAdminFeatures();
 		String timeZone = theatreAdmin.getTimeZone();
+		InMemoryDatabase.changeShowStatus();
+		ticketServiceObj.changeTicketStatus();
 		switch (choice) {
 		case 1:
 			System.out.println("You have Selected Add Show");
@@ -93,11 +96,25 @@ public class TheatreAdminOperations {
 			theatreAdminService.deleteTheatre(theatreAdmin);
 			theatreAminOperations(theatreAdmin);
 			break;
-
 		case 15:
+			System.out.println("You have Selected Delete Theatre");
+			theatreAdminService.printRunningShow(theatreAdmin, theatreAdmin.getTimeZone());
+			theatreAminOperations(theatreAdmin);
+			break;
+		case 16:
+			System.out.println("You have selected to view seat allocations for past shows.");
+			theatreAdminService.viewSeatAllocationForPastShows(theatreAdmin);
+			theatreAminOperations(theatreAdmin);
+			break;
+		case 17:
 			System.out.println("You have Selected Exit");
 			int choice1 = MainMenu.mainMenu();
 			MainMenu.call(choice1);
+			break;
+		case 0:
+			System.out.println("You have Selected Exit");
+			int choice0 = MainMenu.mainMenu();
+			MainMenu.call(choice0);
 			break;
 		}
 	}
@@ -110,7 +127,8 @@ public class TheatreAdminOperations {
 		String[] features = { "1 . Add Show ", "2 . Print All Shows In This Theatre",
 				"3 . Display Display Seat Availability", "4 . Add Screen ", "5 . Edit Theatre Admin Details",
 				"6 . Print future Shows", "7 . Change Time Zone", "8 . Request New Theatre", "9 . Delete Screen",
-				"10. Cancel Show", "11. Display All Movies", "12. Display Screen","13. Check Request Status","14. Delete Theatre","15. Exit" };
+				"10. Cancel Show", "11. Display All Movies", "12. Display Screen", "13. Check Request Status",
+				"14. Delete Theatre", "15. Display Running Show", "16. view Seat Allocation For Past Shows","17. Exit" };
 
 		int n = features.length;
 		for (int i = 0; i < n; i++) {
@@ -135,7 +153,7 @@ public class TheatreAdminOperations {
 			return;
 		}
 
-		Movies movieObj = ticketServiceObj.selectTheatreMovie1(theatreAdmin,theatreObj);
+		Movies movieObj = ticketServiceObj.selectTheatreMovie1(theatreAdmin, theatreObj);
 		if (movieObj == null) {
 			System.out.println("------Back------");
 			return;

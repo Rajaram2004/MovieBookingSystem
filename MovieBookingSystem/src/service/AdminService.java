@@ -423,7 +423,7 @@ public class AdminService {
 				System.err.println("Please enter a valid year.");
 			}
 		}
-		Movies movie = new Movies(movieId, title, duration, genre, language, releaseYear, new ArrayList<>());
+		Movies movie = new Movies(movieId, title, duration, genre, language, releaseYear);
 
 		movieDB.put(movieId, movie);
 		System.out.println("\nMovie added successfully!");
@@ -527,22 +527,29 @@ public class AdminService {
 	}
 
 	public void printAllShows(String timeZone) {
-		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm").withZone(ZoneId.of(timeZone));
+	    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")
+	            .withZone(ZoneId.of(timeZone));
 
-		System.out.println("+---------+----------------------+------------------------+-----------+-------------------+");
-		System.out.println("| Show ID | Theatre              | Movie                  | Screen    | Date & Time       |");
-		System.out.println("+---------+----------------------+------------------------+-----------+-------------------+");
+	    System.out.println("+---------+--------------------------+------------------------+-----------+-------------------+-----------+");
+	    System.out.println("| Show ID | Theatre                  | Movie                  | Screen    | Date & Time       | Status    |");
+	    System.out.println("+---------+--------------------------+------------------------+-----------+-------------------+-----------+");
 
-		for (Map.Entry<Long, Show> entry : showDB.entrySet()) {
-			Show s = entry.getValue();
-			if(s.isActive()==true) {
-				String dateTime = formatter.format(Instant.ofEpochSecond(s.getDateTimeEpoch()));
-				System.out.printf("| %-7d | %-20s | %-22s | %-9s | %-17s |\n", s.getShowId(),
-						s.getTheatre().getTheatreName(), s.getMovie().getMovieTitle(), s.getScreen().getScreenNumber(),
-						dateTime);
-			}
-		}
+	    for (Map.Entry<Long, Show> entry : showDB.entrySet()) {
+	        Show s = entry.getValue();
 
-		System.out.println("+---------+----------------------+------------------------+-----------+-------------------+");
+	        String dateTime = formatter.format(Instant.ofEpochSecond(s.getDateTimeEpoch()));
+	       
+
+	        System.out.printf("| %-7d | %-20s | %-26s | %-9s | %-17s | %-9s |\n",
+	                s.getShowId(),
+	                s.getTheatre().getTheatreName(),
+	                s.getMovie().getMovieTitle(),
+	                s.getScreen().getScreenNumber(),
+	                dateTime,
+	                s.isActive());
+	    }
+
+	    System.out.println("+---------+--------------------------+------------------------+-----------+-------------------+-----------+");
 	}
+
 }

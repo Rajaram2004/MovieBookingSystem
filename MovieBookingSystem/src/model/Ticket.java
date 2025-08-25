@@ -9,13 +9,13 @@ public class Ticket {
 	private Theatre theatre;
 	private Show show;
 	private List<Seat> seats;
-	private int bookingDateEpoch;
+	private long bookingDateEpoch;
 	private double totalAmount;
 	private String status;
 	
 	 
 	public Ticket(Long ticketId, User user, Movies movie, Theatre theatre, Show show, List<Seat> seats,
-			int bookingDateEpoch, double totalAmount, String status ) {
+			long bookingDateEpoch, double totalAmount, String status ) {
 		this.ticketId = ticketId;
 		this.user = user;
 		this.movie = movie;
@@ -62,12 +62,12 @@ public class Ticket {
 	public void setTheatre(Theatre theatre) {
 		this.theatre = theatre;
 	}
-	public int getBookingDateEpoch() {
+	public long getBookingDateEpoch() {
 		return bookingDateEpoch;
 	}
-	public void setBookingDateEpoch(int bookingDateEpoch) {
-		bookingDateEpoch = bookingDateEpoch;
-	}
+//	public void setBookingDateEpoch(int bookingDateEpoch) {
+//		bookingDateEpoch = bookingDateEpoch;
+//	}
 	public double getTotalAmount() {
 		return totalAmount;
 	}

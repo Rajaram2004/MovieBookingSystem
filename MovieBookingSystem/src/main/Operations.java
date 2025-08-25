@@ -22,6 +22,8 @@ public class Operations {
 			TheatreService theatreServiceObj, HashMap<Long, Ticket> ticketDB) {
 		int userChoice = Features();
 		String timeZone = user.getTimeZone();
+		InMemoryDatabase.changeShowStatus();
+		ticketServiceObj.changeTicketStatus();
 		switch (userChoice) {
 		case 1:
 			System.out.println("You have Selected display All Movie");
@@ -145,10 +147,6 @@ public class Operations {
 	}
 	
 	
-	
-	
-	
-
 	public static int Features() {
 		System.out.println("\n========= Welcome to Movie Booking System =========");
 		System.out.println("Please select one of the following options:\n");
@@ -188,7 +186,8 @@ public class Operations {
 		Movies movieObj = ticketServiceObj.selectMovie();
 		if(movieObj==null) return;
 		Theatre theatreObj = ticketServiceObj.selectTheatreForMovie(movieObj);
-		if(theatreObj==null) return;
+		if (theatreObj == null)
+			return;
 		List<Show> shows = ticketServiceObj.getShowsForMovieAndTheatre(movieObj, theatreObj);
 		Show show = ticketServiceObj.getShow(shows, timeZone);
 		if (show == null) {

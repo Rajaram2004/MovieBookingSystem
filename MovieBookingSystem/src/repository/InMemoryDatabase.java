@@ -7,6 +7,7 @@ import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
 import model.Admin;
@@ -24,33 +25,33 @@ public class InMemoryDatabase {
 	static HashMap<Long, User> userDB = new HashMap<>();
 	static HashMap<Long, TheatreAdmin> theatreAdminDB = new HashMap<>();
 	static HashMap<Long, Admin> adminDB = new HashMap<>();
-	static HashMap<Long,Theatre> theatreDB = new HashMap<>();
-	static HashMap<Long,Movies> movieDB = new HashMap<>();
-	static HashMap<Long,Show> showDB = new HashMap<>();
-	static HashMap<Long,Ticket> ticketDB =new HashMap<>();
-	static HashMap<Long,RequestTheatre> RequestTheatreDB =new HashMap<>();
-
-
-
-
+	static HashMap<Long, Theatre> theatreDB = new HashMap<>();
+	static HashMap<Long, Movies> movieDB = new HashMap<>();
+	static HashMap<Long, Show> showDB = new HashMap<>();
+	static HashMap<Long, Ticket> ticketDB = new HashMap<>();
+	static HashMap<Long, RequestTheatre> RequestTheatreDB = new HashMap<>();
 
 	public InMemoryDatabase() {
 		userDB = InMemoryDatabase.getUserDB();
-		userDB.put(1L, new User(1L, "User 1", "user1@example.com", 987654321L, "Chennai", "pass123",2000,"Asia/Kolkata"));
-		userDB.put(2L, new User(2L, "User 2", "user2@example.com", 123456789L, "Bangalore", "pass456",20000,"Asia/Kolkata"));
-		userDB.put(3L, new User(3L, "User 3", "user3@example.com", 912345678L, "Mumbai", "pass789",20000,"Asia/Kolkata"));
-		userDB.put(4L, new User(4L, "User 4", "user4@example.com", 123456L, "Mumbai", "1",20000,"Asia/Kolkata"));
+		userDB.put(1L,
+				new User(1L, "User 1", "user1@example.com", 987654321L, "Chennai", "pass123", 2000, "Asia/Kolkata"));
+		userDB.put(2L,
+				new User(2L, "User 2", "user2@example.com", 123456789L, "Bangalore", "pass456", 20000, "Asia/Kolkata"));
+		userDB.put(3L,
+				new User(3L, "User 3", "user3@example.com", 912345678L, "Mumbai", "pass789", 20000, "Asia/Kolkata"));
+		userDB.put(4L, new User(4L, "User 4", "user4@example.com", 123456L, "Mumbai", "1", 20000, "Asia/Kolkata"));
 
-		Theatre t = null;
+		theatreAdminDB.put(1L, new TheatreAdmin(1L, "Admin One", "theatreadmin1@example.com", 987654321L, "pass123",
+				new ArrayList<>(), "Asia/Kolkata"));
+		theatreAdminDB.put(2L, new TheatreAdmin(2L, "Admin Two", "theatreadmin2@example.com", 123456789L, "pass456",
+				new ArrayList<>(), "Asia/Kolkata"));
+		theatreAdminDB.put(3L, new TheatreAdmin(3L, "Admin Three", "theatreadmin3@example.com", 912345678L, "pass789",
+				new ArrayList<>(), "Asia/Kolkata"));
 
-		theatreAdminDB.put(1L, new TheatreAdmin(1L, "Admin One", "theatreadmin1@example.com", 987654321L, "pass123", new ArrayList<>(),"Asia/Kolkata"));
-		theatreAdminDB.put(2L, new TheatreAdmin(2L, "Admin Two", "theatreadmin2@example.com", 123456789L, "pass456", new ArrayList<>(),"Asia/Kolkata"));
-		theatreAdminDB.put(3L, new TheatreAdmin(3L, "Admin Three", "theatreadmin3@example.com", 912345678L, "pass789", new ArrayList<>(),"Asia/Kolkata"));
+		adminDB.put(1L, new Admin(1L, "Rajaram", "admin1@example.com", 987654321L, "pass123", "Asia/Kolkata"));
+		adminDB.put(2L, new Admin(2L, "Priya", "admin2@example.com", 123456789L, "pass456", "Asia/Kolkata"));
+		adminDB.put(3L, new Admin(3L, "Arjun", "admin3@example.com", 912345678L, "pass789", "Asia/Kolkata"));
 
-		adminDB.put(1L, new Admin(1L, "Rajaram", "admin1@example.com", 987654321L, "pass123","Asia/Kolkata"));
-		adminDB.put(2L, new Admin(2L, "Priya", "admin2@example.com", 123456789L, "pass456","Asia/Kolkata"));
-		adminDB.put(3L, new Admin(3L, "Arjun", "admin3@example.com", 912345678L, "pass789","Asia/Kolkata"));
-		
 		initializeMoviesAndTheatres();
 	}
 //	
@@ -177,130 +178,384 @@ public class InMemoryDatabase {
 //		theatreDB.put(4L, theatre104);
 //		theatreDB.put(5L, theatre105);
 //	}
-	
-	
-	
-	
+
 	public void initializeMoviesAndTheatres() {
-	    String[] theatreNames = {
-	        "Sathyam Cinemas", "KG Cinemas", "INOX", "Thangam Cinemas", "PVR Velachery",
-	        "PVR Phoenix", "Escape Cinemas", "AVM Cinemas", "SPI Cinemas", "Mayajaal"
-	    };
-	    String[] theatreCities = {
-	        "Chennai", "Coimbatore", "Madurai", "Trichy", "Chennai",
-	        "Bangalore", "Chennai", "Chennai", "Chennai", "Chennai"
-	    };
 
-	    List<Theatre> theatres = new ArrayList<>();     //Theatre with 3 screen
-	    for (int t = 0; t < theatreNames.length; t++) {
-	        List<Screen> screens = new ArrayList<>();
-	        for (int s = 1; s <= 3; s++) {
-	            screens.add(new Screen(s, null, 10, 12));
-	        }
-	        Theatre theatre = new Theatre(1L + t, theatreNames[t], theatreCities[t], screens, new ArrayList<>(),true);
-	        theatres.add(theatre);
-	        theatreDB.put((long) (t + 1), theatre);
-	    }
+		// ------------------------- THEATRES -------------------------
+		String[] theatreNames = { "Sathyam Cinemas", "KG Cinemas", "INOX", "Thangam Cinemas", "PVR Velachery",
+				"PVR Phoenix", "Escape Cinemas", "AVM Cinemas", "SPI Cinemas", "Mayajaal" };
+		String[] theatreCities = { "Chennai", "Coimbatore", "Madurai", "Trichy", "Chennai", "Bangalore", "Chennai",
+				"Chennai", "Chennai", "Chennai" };
 
-	    String[] movieTitles = {
-	        "Vikram", "Master", "Jailer", "Leo", "RRR", "Pushpa: The Rise",
-	        "Baahubali: The Beginning", "Baahubali: The Conclusion",
-	        "Pathaan", "Tiger 3", "Drishyam 2", "Ponniyin Selvan"
-	    };
-	    String[] genres = {
-	        "Action", "Drama", "Comedy", "Thriller", "Action", "Action", "Drama", "Action",
-	        "Action", "Action", "Thriller", "Historical"
-	    };
-	    String[] languages = {
-	        "Tamil", "Telugu", "English", "Tamil", "Telugu", "English",
-	        "English", "Tamil", "Hindi", "Hindi", "Malayalam", "Tamil"
-	    };
-	    int[] releaseYears = {
-	        2022, 2021, 2023, 2023, 2022, 2021, 2015, 2017, 2023, 2023, 2021, 2022
-	    };
-	    int[] durations = {
-	        173, 179, 168, 164, 182, 179, 159, 171, 165, 160, 150, 190
-	    };
+		List<Integer> seatsPerRow = new ArrayList<>(List.of(5, 5, 5, 5, 10, 10, 10, 10, 15, 15, 15));
+		List<Double> pricePerRow = new ArrayList<>(List.of(100.0, 100.0, 100.0, 100.0, 100.0, 150.0, 150.0, 150.0,
+				150.0, 150.0, 200.0, 200.0, 200.0, 200.0, 200.0));
 
-	    List<Movies> movies = new ArrayList<>();
-	    Random rand = new Random();
-	    for (int m = 0; m < movieTitles.length; m++) {   //movies
-	        int numTheatres = 2 + rand.nextInt(3); 
-	        List<Theatre> movieTheatres = new ArrayList<>();
-	        while (movieTheatres.size() < numTheatres) {
-	            Theatre th = theatres.get(rand.nextInt(theatres.size()));
-	            if (!movieTheatres.contains(th)) movieTheatres.add(th);
-	        }
+		List<Theatre> theatres = new ArrayList<>();
+		for (int t = 0; t < theatreNames.length; t++) {
+			List<Screen> screens = new ArrayList<>();
+			for (int s = 1; s <= 3; s++) {
+				screens.add(new Screen(s, seatsPerRow, pricePerRow));
+			}
 
-	        Movies movie = new Movies((long) (m + 1), movieTitles[m], durations[m], genres[m], languages[m], releaseYears[m], movieTheatres);
-	        movies.add(movie);
-	        movieDB.put((long) (m + 1), movie);
-	    }
+			Theatre theatre = new Theatre(1L + t, theatreNames[t], theatreCities[t], screens, new ArrayList<>(),
+					new ArrayList<>(), true);
 
-	   
-	    long showId = 1L;
-	    LocalDate startDate = LocalDate.now().plusDays(1); 
-	    for (Movies movie : movies) {
-	        for (Theatre theatre : movie.getListOfTheatre()) {
-	            List<Screen> theatreScreens = theatre.getListOfScreen();
-	            for (int i = 0; i < theatreScreens.size(); i++) {
-	                Screen screen = theatreScreens.get(i);
-	                LocalDate showDate = startDate.plusDays(rand.nextInt(5));
-	                LocalTime showTime = LocalTime.of(10 + rand.nextInt(9), rand.nextBoolean() ? 0 : 30); 
-	                ZonedDateTime zdt = ZonedDateTime.of(showDate, showTime, ZoneId.of("Asia/Kolkata"));
-	                int epoch = (int) zdt.toEpochSecond();
-	                List<Seat> seats = new ArrayList<>();
-	                for (int r = 1; r <= 10; r++) {
-	                    for (int c = 1; c <= 12; c++) {
-	                        String seatNum = "R" + r + "C" + c;
-	                        seats.add(new Seat(seatNum, r, c, "Regular", 150, true));
-	                    }
-	                }
-	                Show show = new Show(showId++, theatre, movie, screen, epoch, seats);
-	                theatre.addShow(show);
-	                showDB.put(show.getShowId(), show);
-	            }
-	        }
-	    }
-	    
-	    theatreAdminDB.get(1L).addTheatre(theatreDB.get(1L));
-	    theatreAdminDB.get(1L).addTheatre(theatreDB.get(2L));
-	    
-	    theatreAdminDB.get(2L).addTheatre(theatreDB.get(3L));
-	    theatreAdminDB.get(2L).addTheatre(theatreDB.get(4L));
-	    
-	    theatreAdminDB.get(3L).addTheatre(theatreDB.get(5L));
-	    theatreAdminDB.get(3L).addTheatre(theatreDB.get(6L));
-	    
+			theatres.add(theatre);
+			theatreDB.put((long) (t + 1), theatre);
+		}
+
+		// ------------------------- MOVIES -------------------------
+		String[] movieTitles = { "Vikram", "Master", "Jailer", "Leo", "RRR", "Pushpa: The Rise",
+				"Baahubali: The Beginning", "Baahubali: The Conclusion", "Pathaan", "Tiger 3", "Drishyam 2",
+				"Ponniyin Selvan" };
+		String[] genres = { "Action", "Drama", "Comedy", "Thriller", "Action", "Action", "Drama", "Action", "Action",
+				"Action", "Thriller", "Historical" };
+		String[] languages = { "Tamil", "Telugu", "English", "Tamil", "Telugu", "English", "English", "Tamil", "Hindi",
+				"Hindi", "Malayalam", "Tamil" };
+		int[] releaseYears = { 2022, 2021, 2023, 2023, 2022, 2021, 2015, 2017, 2023, 2023, 2021, 2022 };
+
+//		long[] releaseEpochs = new long[releaseYears.length];
+//
+//		for (int i = 0; i < releaseYears.length; i++) {
+//			// Create unique dates by using day = index + 1, month = (i % 12) + 1
+//			LocalDate date = LocalDate.of(releaseYears[i], (i % 12) + 1, (i % 27) + 1);
+//
+//			// Convert to epoch seconds
+//			releaseEpochs[i] = date.atStartOfDay(ZoneId.systemDefault()).toEpochSecond();
+//		}
+//
+//		// Print release years with their unique epoch timestamps
+//		System.out.println("Year  ->  Epoch");
+//		for (int i = 0; i < releaseYears.length; i++) {
+//			System.out.println(releaseYears[i] + " -> " + releaseEpochs[i]);
+//		}
+
+		int[] durations = { 173, 179, 168, 164, 182, 179, 159, 171, 165, 160, 150, 190 };
+
+		List<Movies> movies = new ArrayList<>();
+		for (int m = 0; m < movieTitles.length; m++) {
+			Movies movie = new Movies((long) (m + 1), movieTitles[m], durations[m], genres[m], languages[m],
+					releaseYears[m]);
+			movies.add(movie);
+			movieDB.put((long) (m + 1), movie);
+		}
+
+		// ------------------------- SHOWS -------------------------
+		long showId = 1L;
+		LocalDate startDate = LocalDate.now().plusDays(1);
+
+		int movieIndex = 0;
+		for (Theatre theatre : theatres) {
+			for (Screen screen : theatre.getListOfScreen()) {
+				Movies movie = movies.get(movieIndex % movies.size());
+
+				if (!theatre.getListOfMovies().contains(movie)) {
+					theatre.getListOfMovies().add(movie);
+				}
+				LocalDate showDate = startDate;
+				int[] showHours = { 10, 14, 18 };
+
+				for (int hour : showHours) {
+					LocalTime showTime = LocalTime.of(hour, 0);
+					ZonedDateTime zdt = ZonedDateTime.of(showDate, showTime, ZoneId.of("Asia/Kolkata"));
+					long epoch = (long) zdt.toEpochSecond();
+
+					List<Seat> seats = new ArrayList<>();
+					for (List<Seat> row : screen.getSeatsLayout()) {
+						for (Seat s : row) {
+							seats.add(new Seat(s.getSeatNumber(), s.getPrice()));
+						}
+					}
+
+					Show show = new Show(showId++, theatre, movie, screen, epoch, seats);
+					theatre.addShow(show);
+					showDB.put(show.getShowId(), show);
+				}
+
+				movieIndex++;
+			}
+		}
+
+		// ------------------------- ADD PAST SHOWS -------------------------
+		long pastShowId = showId;
+		LocalDate pastStartDate = LocalDate.now().minusDays(7);
+
+		for (Theatre theatre : theatres) {
+			for (Screen screen : theatre.getListOfScreen()) {
+				Movies movie = movies.get(movieIndex % movies.size());
+				if (!theatre.getListOfMovies().contains(movie)) {
+					theatre.getListOfMovies().add(movie);
+				}
+				for (int day = 0; day < 2; day++) {
+					LocalDate pastShowDate = pastStartDate.plusDays(day);
+					int[] showHours = { 10, 14, 18 };
+					for (int hour : showHours) {
+						LocalTime showTime = LocalTime.of(hour, 0);
+						ZonedDateTime zdt = ZonedDateTime.of(pastShowDate, showTime, ZoneId.of("Asia/Kolkata"));
+						int epoch = (int) zdt.toEpochSecond();
+						List<Seat> seats = new ArrayList<>();
+						for (List<Seat> row : screen.getSeatsLayout()) {
+							for (Seat s : row) {
+								seats.add(new Seat(s.getSeatNumber(), s.getPrice()));
+							}
+						}
+						Show pastShow = new Show(pastShowId++, theatre, movie, screen, epoch, seats);
+						pastShow.setActive("Completed");
+						theatre.addShow(pastShow);
+						showDB.put(pastShow.getShowId(), pastShow);
+					}
+				}
+				movieIndex++;
+			}
+		}
+
+		theatreAdminDB.get(1L).addTheatre(theatreDB.get(1L));
+		theatreAdminDB.get(1L).addTheatre(theatreDB.get(2L));
+
+		theatreAdminDB.get(2L).addTheatre(theatreDB.get(3L));
+		theatreAdminDB.get(2L).addTheatre(theatreDB.get(4L));
+
+		theatreAdminDB.get(3L).addTheatre(theatreDB.get(5L));
+		theatreAdminDB.get(3L).addTheatre(theatreDB.get(6L));
+
+		createDummyTickets();
+
+	}
+
+	private void createDummyTickets() {
+		User user1 = userDB.get(1L);
+		User user2 = userDB.get(2L);
+		User user3 = userDB.get(3L);
+
+		Theatre theatre1 = theatreDB.get(1L);
+		Theatre theatre2 = theatreDB.get(2L);
+		Theatre theatre3 = theatreDB.get(3L);
+		Theatre theatre4 = theatreDB.get(4L);
+		Theatre theatre5 = theatreDB.get(5L);
+
+		Movies movie1 = movieDB.get(1L);
+		Movies movie2 = movieDB.get(2L);
+		Movies movie3 = movieDB.get(3L);
+		Movies movie4 = movieDB.get(4L);
+		Movies movie5 = movieDB.get(5L);
+
+		Show show91 = showDB.get(91L);
+		Show show92 = showDB.get(92L);
+		Show show93 = showDB.get(93L);
+		Show show94 = showDB.get(94L);
+		Show show95 = showDB.get(95L);
+
+		// Ticket 1
+
+		List<List<Seat>> seatShow91 = show91.getShowSeats();
+		List<Seat> seats1 = new ArrayList<>();
+		for (List<Seat> row : seatShow91) {
+			for (Seat seat : row) {
+				if (seat.getSeatNumber().equalsIgnoreCase("A1")) {
+					seats1.add(seat);
+					seat.setBooked(true);
+				}
+			}
+		}
+		Ticket ticket1 = new Ticket(1L, user1, movie1, theatre1, show91, seats1, show91.getDateTimeEpoch(), 400.0,
+				"Upcoming");
+		ticketDB.put(1L, ticket1);
+
+		List<List<Seat>> seatShow92 = show92.getShowSeats();
+		List<Seat> seats2 = new ArrayList<>();
+		for (List<Seat> row : seatShow92) {
+			for (Seat seat : row) {
+				if (seat.getSeatNumber().equalsIgnoreCase("c1") || seat.getSeatNumber().equalsIgnoreCase("c2")
+						|| seat.getSeatNumber().equalsIgnoreCase("g1")) {
+					seats2.add(seat);
+					seat.setBooked(true);
+				}
+			}
+		}
+		Ticket ticket2 = new Ticket(2L, user2, movie2, theatre2, show92, seats2, show92.getDateTimeEpoch(), 250.0,
+				"Upcoming");
+		ticketDB.put(2L, ticket2);
+
+		// Ticket 3
+		List<List<Seat>> seatShow93 = show93.getShowSeats();
+		List<Seat> seats3 = new ArrayList<>();
+		for (List<Seat> row : seatShow93) {
+			for (Seat seat : row) {
+				if (seat.getSeatNumber().equalsIgnoreCase("b1") || seat.getSeatNumber().equalsIgnoreCase("b2")
+						|| seat.getSeatNumber().equalsIgnoreCase("b3")) {
+					seats3.add(seat);
+					seat.setBooked(true);
+				}
+			}
+		}
+		Ticket ticket3 = new Ticket(3L, user3, movie3, theatre3, show93, seats3, show93.getDateTimeEpoch(), 900.0,
+				"Upcoming");
+		ticketDB.put(3L, ticket3);
+
+		// Ticket 4
+		List<List<Seat>> seatShow94 = show94.getShowSeats();
+		List<Seat> seats4 = new ArrayList<>();
+		for (List<Seat> row : seatShow94) {
+			for (Seat seat : row) {
+				if (seat.getSeatNumber().equalsIgnoreCase("b1") || seat.getSeatNumber().equalsIgnoreCase("b2")
+						|| seat.getSeatNumber().equalsIgnoreCase("b3")) {
+					seats4.add(seat);
+					seat.setBooked(true);
+				}
+			}
+		}
+		Ticket ticket4 = new Ticket(4L, user1, movie4, theatre4, show94, seats4, show94.getDateTimeEpoch(), 180.0,
+				"Upcoming");
+		ticketDB.put(4L, ticket4);
+
+		// Ticket 5
+		List<List<Seat>> seatShow95 = show95.getShowSeats();
+		List<Seat> seats5 = new ArrayList<>();
+		for (List<Seat> row : seatShow95) {
+			for (Seat seat : row) {
+				if (seat.getSeatNumber().equalsIgnoreCase("b1") || seat.getSeatNumber().equalsIgnoreCase("b2")
+						|| seat.getSeatNumber().equalsIgnoreCase("b3")) {
+					seats5.add(seat);
+					seat.setBooked(true);
+				}
+			}
+		}
+		Ticket ticket5 = new Ticket(5L, user2, movie5, theatre5, show95, seats5, show95.getDateTimeEpoch(), 440.0,
+				"Upcoming");
+		ticketDB.put(5L, ticket5);
+
+		// Ticket 6
+
+		List<Seat> seats6 = new ArrayList<>();
+		for (List<Seat> row : seatShow91) {
+			for (Seat seat : row) {
+				if (seat.getSeatNumber().equalsIgnoreCase("a4") || seat.getSeatNumber().equalsIgnoreCase("a5")) {
+					seats6.add(seat);
+					seat.setBooked(true);
+				}
+			}
+		}
+		Ticket ticket6 = new Ticket(6L, user3, movie1, theatre1, show91, seats6, show91.getDateTimeEpoch(), 200.0,
+				"Upcoming");
+		ticketDB.put(6L, ticket6);
+
+		// Ticket 7
+		List<Seat> seats7 = new ArrayList<>();
+		for (List<Seat> row : seatShow92) {
+			for (Seat seat : row) {
+				if (seat.getSeatNumber().equalsIgnoreCase("c4") || seat.getSeatNumber().equalsIgnoreCase("c5")) {
+					seats7.add(seat);
+					seat.setBooked(true);
+				}
+			}
+		}
+		Ticket ticket7 = new Ticket(7L, user1, movie2, theatre2, show92, seats7, show92.getDateTimeEpoch(), 520.0,
+				"Upcoming");
+		ticketDB.put(7L, ticket7);
+
+		// Ticket 8
+		List<Seat> seats8 = new ArrayList<>();
+		for (List<Seat> row : seatShow93) {
+			for (Seat seat : row) {
+				if (seat.getSeatNumber().equalsIgnoreCase("d4") || seat.getSeatNumber().equalsIgnoreCase("d5")) {
+					seats8.add(seat);
+					seat.setBooked(true);
+				}
+			}
+		}
+		Ticket ticket8 = new Ticket(8L, user2, movie3, theatre3, show93, seats8, show93.getDateTimeEpoch(), 300.0,
+				"Upcoming");
+		ticketDB.put(8L, ticket8);
+
+		// Ticket 9
+		List<Seat> seats9 = new ArrayList<>();
+		for (List<Seat> row : seatShow94) {
+			for (Seat seat : row) {
+				if (seat.getSeatNumber().equalsIgnoreCase("e4") || seat.getSeatNumber().equalsIgnoreCase("e1")) {
+					seats9.add(seat);
+					seat.setBooked(true);
+				}
+			}
+		}
+		Ticket ticket9 = new Ticket(9L, user3, movie4, theatre4, show94, seats9, show94.getDateTimeEpoch(), 420.0,
+				"Upcoming");
+		ticketDB.put(9L, ticket9);
+
+		// Ticket 10
+		List<Seat> seats10 = new ArrayList<>();
+		for (List<Seat> row : seatShow91) {
+			for (Seat seat : row) {
+				if (seat.getSeatNumber().equalsIgnoreCase("f1") || seat.getSeatNumber().equalsIgnoreCase("f2")) {
+					seats10.add(seat);
+					seat.setBooked(true);
+				}
+			}
+		}
+		Ticket ticket10 = new Ticket(10L, user1, movie5, theatre5, show95, seats10, show95.getDateTimeEpoch(), 280.0,
+				"Upcoming");
+		ticketDB.put(10L, ticket10);
+	}
+
+//	public static void changeShowStatus(){
+//		for(Show show:showDB.values()) {
+//			if(show.isActive().equalsIgnoreCase("upcoming") && show.getDateTimeEpoch() <System.currentTimeMillis()/1000) {
+//				show.setActive("Completed");
+//			}
+//		}
+//	}
+	public static void changeShowStatus() {
+		long currentEpoch = System.currentTimeMillis() / 1000;
+
+		for (Show show : showDB.values()) {
+			long startEpoch = show.getDateTimeEpoch();
+			long endEpoch = startEpoch + (show.getMovie().getDuration() * 60);
+
+			if (currentEpoch >= startEpoch && currentEpoch <= endEpoch) {
+				show.setActive("Running");
+			} else if ((show.isActive().equalsIgnoreCase("upcoming") || (show.isActive().equalsIgnoreCase("Running")))
+					&& currentEpoch > endEpoch) {
+				show.setActive("Completed");
+			}
+		}
 	}
 
 	public static HashMap<Long, User> getUserDB() {
 		return userDB;
 	}
+
 	public static void setUserDB(HashMap<Long, User> userDB) {
 		InMemoryDatabase.userDB = userDB;
 	}
+
 	public static HashMap<Long, TheatreAdmin> getTheatreAdminDB() {
 		return theatreAdminDB;
 	}
+
 	public static void setTheatreAdminDB(HashMap<Long, TheatreAdmin> theatreAdminDB) {
 		InMemoryDatabase.theatreAdminDB = theatreAdminDB;
 	}
+
 	public static HashMap<Long, Admin> getAdminDB() {
 		return adminDB;
 	}
+
 	public static void setAdminDB(HashMap<Long, Admin> adminDB) {
 		InMemoryDatabase.adminDB = adminDB;
 	}
+
 	public static HashMap<Long, Theatre> getTheatreDB() {
 		return theatreDB;
 	}
+
 	public static void setTheatreDB(HashMap<Long, Theatre> theatreDB) {
 		InMemoryDatabase.theatreDB = theatreDB;
 	}
+
 	public static HashMap<Long, Movies> getMovieDB() {
 		return movieDB;
 	}
+
 	public static void setMovieDB(HashMap<Long, Movies> movieDB) {
 		InMemoryDatabase.movieDB = movieDB;
 	}
@@ -308,18 +563,23 @@ public class InMemoryDatabase {
 	public static HashMap<Long, Show> getShowDB() {
 		return showDB;
 	}
+
 	public static void setShowDB(HashMap<Long, Show> showDB) {
 		InMemoryDatabase.showDB = showDB;
 	}
+
 	public static HashMap<Long, Ticket> getTicketDB() {
 		return ticketDB;
 	}
+
 	public static void setTicketDB(HashMap<Long, Ticket> ticketDB) {
 		InMemoryDatabase.ticketDB = ticketDB;
 	}
+
 	public static HashMap<Long, RequestTheatre> getRequestTheatreDb() {
 		return RequestTheatreDB;
 	}
+
 	public static void setRequestTheatreDb(HashMap<Long, RequestTheatre> requestTheatreDb) {
 		RequestTheatreDB = requestTheatreDb;
 	}

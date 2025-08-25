@@ -1,59 +1,57 @@
 package model;
 
 public class Seat {
-	private String seatNumber;     
-	private int rowNumber;
-	private int colNumber;
-	private String seatType;    
-	private double seatPrice;
-	private boolean seatStatus;
-	
-	public Seat(String seatNumber, int rowNumber, int colNumber, String seatType, double seatPrice,
-			boolean seatStatus) {
+	private String seatNumber;
+	private double price;
+	private boolean isBooked;
+
+	public Seat(String seatNumber, double price) {
 		this.seatNumber = seatNumber;
-		this.rowNumber = rowNumber;
-		this.colNumber = colNumber;
-		this.seatType = seatType;
-		this.seatPrice = seatPrice;
-		this.seatStatus = seatStatus;
+		this.price=price;
 	}
+
 	public Seat() {
-		// TODO Auto-generated constructor stub
+		
 	}
-	public double getSeatPrice() {
-		return seatPrice;
+	  public String toString() {
+	        return seatNumber + " (" + price + "₹)" + (isBooked ? " [X]" : "");
+	    }
+
+	public void bookSeat() {
+		if (!isBooked) {
+			this.isBooked = true;
+			System.out.println("Seat " + seatNumber + " booked successfully!");
+		} else {
+			System.out.println("Seat " + seatNumber + " is already booked.");
+		}
 	}
-	public void setSeatPrice(double seatPrice) {
-		this.seatPrice = seatPrice;
+
+	public void unBookSeat() {
+		this.isBooked = false; 
 	}
+
 	public String getSeatNumber() {
 		return seatNumber;
 	}
+
 	public void setSeatNumber(String seatNumber) {
 		this.seatNumber = seatNumber;
 	}
-	public int getRowNumber() {
-		return rowNumber;
+
+	public double getPrice() {
+		return price;
 	}
-	public void setRowNumber(int rowNumber) {
-		this.rowNumber = rowNumber;
+
+	public void setPrice(double price) {
+		this.price = price;
 	}
-	public int getColNumber() {
-		return colNumber;
+
+	public boolean isBooked() {
+		return isBooked;
 	}
-	public void setColNumber(int colNumber) {
-		this.colNumber = colNumber;
+
+	public void setBooked(boolean isBooked) {
+		this.isBooked = isBooked;
 	}
-	public String getSeatType() {
-		return seatType;
-	}
-	public void setSeatType(String seatType) {
-		this.seatType = seatType;
-	}
-	public boolean isSeatStatus() {
-		return seatStatus;
-	}
-	public void setSeatStatus(boolean seatStatus) {
-		this.seatStatus = seatStatus;
-	} 
+
 }

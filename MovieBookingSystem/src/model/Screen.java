@@ -5,109 +5,84 @@ import java.util.List;
 
 public class Screen {
 	private int screenNumber;
-	private List<Seat> seats ;
-	private int cols;
-	private int rows;
-	int premiumRows; 
-	
-	int regularRows ;
-	boolean isActive;
-	public Screen(int screenNumber, List<Seat> seats, int cols, int rows) {
-		this.screenNumber = screenNumber;
-		this.premiumRows=3;
-		this.regularRows=3;
-		this.cols = cols;
-		this.rows = rows;
-		this.isActive=true;
-		if(seats==null) {
-			this.seats=new ArrayList<>();
-			createSeatLayout(rows,cols);
-		}else {
-			this.seats = seats;
+	private List<List<Seat>> seatsLayout;
+	private List<Double> price;
+	private boolean isActive;
+
+	public Screen(int screenId, List<Integer> seatsPerRow, List<Double> price) {
+		this.screenNumber = screenId;
+		isActive = true;
+		this.seatsLayout = new ArrayList<>();
+		createSeats(seatsPerRow, price);
+	}
+
+	private void createSeats(List<Integer> seatsPerRow, List<Double> price) {
+		for (int row = 0; row < seatsPerRow.size(); row++) {
+			int seatCount = seatsPerRow.get(row);
+			List<Seat> rowSeats = new ArrayList<>();
+
+			char rowLabel = (char) ('A' + row);
+			double pricePerRow = price.get(row);
+			for (int seatNum = 1; seatNum <= seatCount; seatNum++) {
+				String seatId = rowLabel + String.valueOf(seatNum);
+
+				rowSeats.add(new Seat(seatId, pricePerRow));
+			}
+			seatsLayout.add(rowSeats);
 		}
 	}
-	
-	public Screen(int screenNumber, List<Seat> seats, int cols, int rows, int premiumRows, int regularRows,
-			boolean isActive) {
-		super();
-		this.screenNumber = screenNumber;
-		this.seats = seats;
-		this.cols = cols;
-		this.rows = rows;
-		this.premiumRows = premiumRows;
-		this.regularRows = regularRows;
-		this.isActive = isActive;
-	}
 
-	private void createSeatLayout(int rows, int cols) {
-        for (int row = 1; row <= rows; row++) {
-            for (int col = 1; col <= cols; col++) {
-                String seatNumber = (char) ('A' + row - 1) + String.valueOf(col);
-
-                String seatType;
-                double seatPrice;
-                if (row <= 3) {
-                    seatType = "Premium";
-                    seatPrice = 300.0;
-                } else if (row <= 6) {
-                    seatType = "Regular";
-                    seatPrice = 200.0;
-                } else {
-                    seatType = "Economy";
-                    seatPrice = 100.0;
-                }
-
-                seats.add(new Seat(seatNumber, row, col, seatType, seatPrice, false));
-            }
-        }
-    }
 	public boolean isActive() {
 		return isActive;
 	}
+
 	public void setActive(boolean isActive) {
 		this.isActive = isActive;
 	}
-	public int getCols() {
-		return cols;
+
+	public void setScreenId(int screenId) {
+		this.screenNumber = screenId;
 	}
 
-	public void setCols(int cols) {
-		this.cols = cols;
+	public void setSeatsLayout(List<List<Seat>> seatsLayout) {
+		this.seatsLayout = seatsLayout;
 	}
 
-	public int getRows() {
-		return rows;
+	public List<List<Seat>> getSeatsLayout() {
+		return seatsLayout;
 	}
 
-	public void setRows(int rows) {
-		this.rows = rows;
-	}
 	public int getScreenNumber() {
 		return screenNumber;
 	}
-	public void setScreenNumber(int screenNumber) {
-		this.screenNumber = screenNumber;
+
+	public void displayLayout() {
+		System.out.println("\n--- Seat Layout for Screen: " + screenNumber + " ---");
+
+		for (int i = 0; i < seatsLayout.size(); i++) {
+			char rowLabel = (char) ('A' + i);
+			System.out.print(rowLabel + "  ");
+
+			for (Seat seat : seatsLayout.get(i)) {
+				if (seat.isBooked()) {
+
+					System.out.print("[X] ");
+				} else {
+
+					System.out.print(seat.getSeatNumber() + " ");
+				}
+			}
+			System.out.println();
+		}
+
+		System.out.println("\nLegend: [Available]  [X = Booked]");
 	}
-	public List<Seat> getSeats() {
-		return seats;
+
+	public List<Double> getPrice() {
+		return price;
 	}
-	public void setSeats(List<Seat> seats) {
-		this.seats = seats;
-	} 
-	public int getPremiumRows() {
-		return premiumRows;
+
+	public void setPrice(List<Double> price) {
+		this.price = price;
 	}
-	public void setPremiumRows(int premiumRows) {
-		this.premiumRows = premiumRows;
-	}
-	public int getRegularRows() {
-		return regularRows;
-	}
-	public void setRegularRows(int regularRows) {
-		this.regularRows = regularRows;
-	}
-	
-	
-	
-	
 }

@@ -3,6 +3,7 @@ package service;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
@@ -11,6 +12,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
+import java.util.stream.Collectors;
 
 import model.Admin;
 import model.Movies;
@@ -34,6 +36,7 @@ public class TheatreAdminService {
 	static HashMap<Long, Ticket> ticketDB = InMemoryDatabase.getTicketDB();
 	AdminService adminService = new AdminService();
 	TheatreService theatreServiceObj = new TheatreService();
+	TicketService ticketServiceObj = new TicketService();
 	Scanner sc = Input.getScanner();
 
 	public TheatreAdminService() {
@@ -160,18 +163,18 @@ public class TheatreAdminService {
 			System.out.println("------Back------");
 			return;
 		}
-		if(theatre.getListOfScreen().isEmpty() || theatre.getListOfScreen()==null) {
+		if (theatre.getListOfScreen().isEmpty() || theatre.getListOfScreen() == null) {
 			System.err.println("No Screen Available in this theatre");
 			return;
 		}
-		boolean screenPresent=false;
-		for(Screen s: theatre.getListOfScreen()) {
-			if(s.isActive()==true) {
-				screenPresent=true;
+		boolean screenPresent = false;
+		for (Screen s : theatre.getListOfScreen()) {
+			if (s.isActive() == true) {
+				screenPresent = true;
 				break;
 			}
 		}
-		if(screenPresent==false) {
+		if (screenPresent == false) {
 			System.err.println("No Screen Available in this theatre");
 			return;
 		}
@@ -180,7 +183,7 @@ public class TheatreAdminService {
 			System.out.println("------Back------");
 			return;
 		}
-		
+
 		long epochTime = getValidDateTime();
 		if (epochTime == 0) {
 			System.out.println("------Back------");
@@ -195,8 +198,8 @@ public class TheatreAdminService {
 		Show show = new Show(showId, theatre, movie, screen, (int) epochTime, null);
 
 		theatre.addShow(show);
-		if(!movie.getListOfTheatre().contains(movie)) {
-			movie.addTheatreToListOfThetare(theatre);
+		if (!theatre.getListOfMovies().contains(movie)) {
+			theatre.getListOfMovies().add(movie);
 		}
 		System.out.println("Show Successfully Created and ID is " + showId);
 		showDB.put(showId, show);
@@ -231,7 +234,7 @@ public class TheatreAdminService {
 
 			List<Long> list = new ArrayList<>();
 			for (Screen s : theatre.getListOfScreen()) {
-				if (s.isActive()==true && isValidShowTime(theatre, s, epochTime, movie.getDuration())) {
+				if (s.isActive() == true && isValidShowTime(theatre, s, epochTime, movie.getDuration())) {
 					list.add((long) s.getScreenNumber());
 				}
 			}
@@ -263,9 +266,9 @@ public class TheatreAdminService {
 	}
 
 	private Movies getValidMovie() {
-		TicketService tc =new TicketService();
+		TicketService tc = new TicketService();
 		while (true) {
-			
+
 			tc.printAllMovies();
 
 			System.out.print("Enter Movie ID (or Type '0' to Exit):");
@@ -308,153 +311,143 @@ public class TheatreAdminService {
 		}
 		return true;
 	}
-	
+
 	private long getValidDateTime() {
-	    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
-	    while (true) {
-	        System.out.print("Enter Show Date & Time (yyyy-MM-dd HH:mm) (or Type 'done' to Exit): ");
-	        String input = sc.nextLine();
-	        if (input.equalsIgnoreCase("done")) {
-	            System.out.println("------Back------");
-	            return 0;
-	        }
-	        try {
-	            LocalDateTime dateTime = LocalDateTime.parse(input, formatter);
-	            LocalDateTime maxDate = LocalDateTime.now().plusMonths(3); 
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+		while (true) {
+			System.out.print("Enter Show Date & Time (yyyy-MM-dd HH:mm) (or Type 'done' to Exit): ");
+			String input = sc.nextLine();
+			if (input.equalsIgnoreCase("done")) {
+				System.out.println("------Back------");
+				return 0;
+			}
+			try {
+				LocalDateTime dateTime = LocalDateTime.parse(input, formatter);
+				LocalDateTime maxDate = LocalDateTime.now().plusMonths(3);
 
-	            if (dateTime.isBefore(LocalDateTime.now())) {
-	                System.err.println("Date/time must be in the future. Please try again.");
-	            } else if (dateTime.isAfter(maxDate)) {
-	                System.err.println("Show must be With in 3 months from now.");
-	                System.out.println("Last allowed date: " + maxDate.format(formatter));
-	            } else {
-	                return dateTime.atZone(ZoneId.systemDefault()).toEpochSecond();
-	            }
-	        } catch (DateTimeParseException e) {
-	            System.err.println("Invalid date/time format. Please try again.");
-	        }
-	    }
+				if (dateTime.isBefore(LocalDateTime.now())) {
+					System.err.println("Date/time must be in the future. Please try again.");
+				} else if (dateTime.isAfter(maxDate)) {
+					System.err.println("Show must be With in 3 months from now.");
+					System.out.println("Last allowed date: " + maxDate.format(formatter));
+				} else {
+					return dateTime.atZone(ZoneId.systemDefault()).toEpochSecond();
+				}
+			} catch (DateTimeParseException e) {
+				System.err.println("Invalid date/time format. Please try again.");
+			}
+		}
 	}
-
-
 
 	public void printShows(TheatreAdmin theatreAdmin, String timeZone) {
-	    if (theatreAdmin == null || theatreAdmin.getTheatre() == null) {
-	        System.err.println("No Theatre Available");
-	        return;
-	    }
+		if (theatreAdmin == null || theatreAdmin.getTheatre() == null) {
+			System.err.println("No Theatre Available");
+			return;
+		}
 
-	    List<Theatre> theatreList = theatreAdmin.getTheatre();
-	    Theatre theatre = selectTheatre(theatreList);
+		List<Theatre> theatreList = theatreAdmin.getTheatre();
+		Theatre theatre = selectTheatre(theatreList);
 
-	    if (theatre == null) {
-	        System.out.println("------Back------");
-	        return;
-	    }
+		if (theatre == null) {
+			System.out.println("------Back------");
+			return;
+		}
 
-	    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")
-	            .withZone(ZoneId.of(timeZone));
-	    List<Show> sortedShows = showDB.values().stream()
-	            .filter(s -> s.getTheatre().getTheatreId() == theatre.getTheatreId() && s.isActive())
-	            .sorted(Comparator.comparingLong(Show::getDateTimeEpoch))
-	            .toList();
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm").withZone(ZoneId.of(timeZone));
 
-	    System.out.println(
-	            "+---------+-------------------+---------------------------+-----------+----------------------+");
-	    System.out.println(
-	            "| Show ID | Theatre           | Movie                     | Screen    | Date & Time          |");
-	    System.out.println(
-	            "+---------+-------------------+---------------------------+-----------+----------------------+");
+		List<Show> sortedShows = showDB.values().stream()
+				.filter(s -> s.getTheatre().getTheatreId() == theatre.getTheatreId())
+				.sorted(Comparator.comparingLong(Show::getDateTimeEpoch)).toList();
 
-	    for (Show s : sortedShows) {
-	        String dateTime = formatter.format(Instant.ofEpochSecond(s.getDateTimeEpoch()));
-	        System.out.printf("| %-7d | %-17s | %-25s | %-9s | %-20s |\n",
-	                s.getShowId(),
-	                s.getTheatre().getTheatreName(),
-	                s.getMovie().getMovieTitle(),
-	                s.getScreen().getScreenNumber(),
-	                dateTime);
-	    }
+		System.out.println(
+				"+---------+-------------------+---------------------------+-----------+----------------------+------------+");
+		System.out.println(
+				"| Show ID | Theatre           | Movie                     | Screen    | Date & Time          | Status     |");
+		System.out.println(
+				"+---------+-------------------+---------------------------+-----------+----------------------+------------+");
 
-	    System.out.println(
-	            "+---------+-------------------+---------------------------+-----------+----------------------+");
+		for (Show s : sortedShows) {
+			String dateTime = formatter.format(Instant.ofEpochSecond(s.getDateTimeEpoch()));
+
+			System.out.printf("| %-7d | %-17s | %-25s | %-9s | %-20s | %-10s |\n", s.getShowId(),
+					s.getTheatre().getTheatreName(), s.getMovie().getMovieTitle(), s.getScreen().getScreenNumber(),
+					dateTime, s.isActive());
+		}
+
+		System.out.println(
+				"+---------+-------------------+---------------------------+-----------+----------------------+------------+");
 	}
-
 
 	public void printShowFuture(TheatreAdmin theatreAdmin, String timeZone) {
-	    if (theatreAdmin == null || theatreAdmin.getTheatre() == null) {
-	        System.err.println("No Theatre Available");
-	        return;
-	    }
+		if (theatreAdmin == null || theatreAdmin.getTheatre() == null) {
+			System.err.println("No Theatre Available");
+			return;
+		}
 
-	    List<Theatre> theatreList = theatreAdmin.getTheatre();
-	    Theatre theatre = selectTheatre(theatreList);
-	    if (theatre == null) {
-	        System.out.println("------Back------");
-	        return;
-	    }
+		List<Theatre> theatreList = theatreAdmin.getTheatre();
+		Theatre theatre = selectTheatre(theatreList);
 
-	    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")
-	            .withZone(ZoneId.of(timeZone));
-	    List<Show> futureShows = new ArrayList<>();
-	    for (Map.Entry<Long, Show> entry : showDB.entrySet()) {
-	        Show s = entry.getValue();
-	        if (s.getTheatre().getTheatreId() == theatre.getTheatreId()
-	                && s.getDateTimeEpoch() > Instant.now().getEpochSecond()
-	                && s.isActive()) {
-	            futureShows.add(s);
-	        }
-	    }
-	    futureShows.sort(Comparator.comparingLong(Show::getDateTimeEpoch));
+		if (theatre == null) {
+			System.out.println("------Back------");
+			return;
+		}
 
-	    System.out.println(
-	            "+---------+-------------------+---------------------------+-----------+----------------------+");
-	    System.out.println(
-	            "| Show ID | Theatre           | Movie                     | Screen    | Date & Time          |");
-	    System.out.println(
-	            "+---------+-------------------+---------------------------+-----------+----------------------+");
-	    for (Show s : futureShows) {
-	        String dateTime = formatter.format(Instant.ofEpochSecond(s.getDateTimeEpoch()));
-	        System.out.printf("| %-7d | %-17s | %-25s | %-9s | %-20s |\n",
-	                s.getShowId(),
-	                s.getTheatre().getTheatreName(),
-	                s.getMovie().getMovieTitle(),
-	                s.getScreen().getScreenNumber(),
-	                dateTime);
-	    }
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm").withZone(ZoneId.of(timeZone));
 
-	    System.out.println(
-	            "+---------+-------------------+---------------------------+-----------+----------------------+");
+		List<Show> futureShows = new ArrayList<>();
+		long currentEpoch = Instant.now().getEpochSecond();
+
+		for (Map.Entry<Long, Show> entry : showDB.entrySet()) {
+			Show s = entry.getValue();
+			if (s.getTheatre().getTheatreId() == theatre.getTheatreId() && s.getDateTimeEpoch() > currentEpoch
+					&& s.isActive().equalsIgnoreCase("upcoming")) {
+				futureShows.add(s);
+			}
+		}
+
+		futureShows.sort(Comparator.comparingLong(Show::getDateTimeEpoch));
+
+		System.out.println(
+				"+---------+-------------------+---------------------------+-----------+----------------------+-----------+");
+		System.out.println(
+				"| Show ID | Theatre           | Movie                     | Screen    | Date & Time          | Status    |");
+		System.out.println(
+				"+---------+-------------------+---------------------------+-----------+----------------------+-----------+");
+
+		for (Show s : futureShows) {
+			String dateTime = formatter.format(Instant.ofEpochSecond(s.getDateTimeEpoch()));
+			String status = s.isActive();
+
+			System.out.printf("| %-7d | %-17s | %-25s | %-9s | %-20s | %-9s |\n", s.getShowId(),
+					s.getTheatre().getTheatreName(), s.getMovie().getMovieTitle(), s.getScreen().getScreenNumber(),
+					dateTime, status);
+		}
+
+		System.out.println(
+				"+---------+-------------------+---------------------------+-----------+----------------------+-----------+");
 	}
-
 
 	public void printShowAllFuture(String timeZone) {
-	    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")
-	            .withZone(ZoneId.of(timeZone));
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm").withZone(ZoneId.of(timeZone));
 
-	    System.out.println(
-	            "+---------+-------------------+---------------------------+-----------+----------------------+");
-	    System.out.println(
-	            "| Show ID | Theatre           | Movie                     | Screen    | Date & Time          |");
-	    System.out.println(
-	            "+---------+-------------------+---------------------------+-----------+----------------------+");
+		System.out.println(
+				"+---------+-------------------+---------------------------+-----------+----------------------+");
+		System.out.println(
+				"| Show ID | Theatre           | Movie                     | Screen    | Date & Time          |");
+		System.out.println(
+				"+---------+-------------------+---------------------------+-----------+----------------------+");
 
-	    showDB.values().stream()
-	            .filter(s -> s.getDateTimeEpoch() > Instant.now().getEpochSecond() && s.isActive())
-	            .sorted(Comparator.comparingLong(Show::getDateTimeEpoch))
-	            .forEach(s -> {
-	                String dateTime = formatter.format(Instant.ofEpochSecond(s.getDateTimeEpoch()));
-	                System.out.printf("| %-7d | %-17s | %-22s | %-9s | %-20s |\n",
-	                        s.getShowId(),
-	                        s.getTheatre().getTheatreName(),
-	                        s.getMovie().getMovieTitle(),
-	                        s.getScreen().getScreenNumber(),
-	                        dateTime);
-	            });
-	    System.out.println(
-	            "+---------+-------------------+---------------------------+-----------+----------------------+");
+		showDB.values().stream().filter(
+				s -> s.getDateTimeEpoch() > Instant.now().getEpochSecond() && s.isActive().equalsIgnoreCase("upcoming"))
+				.sorted(Comparator.comparingLong(Show::getDateTimeEpoch)).forEach(s -> {
+					String dateTime = formatter.format(Instant.ofEpochSecond(s.getDateTimeEpoch()));
+					System.out.printf("| %-7d | %-17s | %-22s | %-9s | %-20s |\n", s.getShowId(),
+							s.getTheatre().getTheatreName(), s.getMovie().getMovieTitle(),
+							s.getScreen().getScreenNumber(), dateTime);
+				});
+		System.out.println(
+				"+---------+-------------------+---------------------------+-----------+----------------------+");
 	}
-
 
 	public void addScreen(TheatreAdmin theatreAdmin) {
 		if (theatreAdmin == null || theatreAdmin.getTheatre() == null) {
@@ -476,48 +469,37 @@ public class TheatreAdminService {
 			return;
 		}
 
-		System.out.println("Enter the Number of Columns (or Type '0' to Exit): ");
-		int totalCols = Input.getInteger(10000);
-		if (totalCols == 0) {
-			System.out.println("------Back------");
-			return;
-		}
+//		System.out.println("Enter the Number of Columns (or Type '0' to Exit): ");
+//		int totalCols = Input.getInteger(10000);
+//		if (totalCols == 0) {
+//			System.out.println("------Back------");
+//			return;
+//		}
 
-		List<Seat> seats = new ArrayList<>();
+		List<Integer> seatsPerRow = new ArrayList<>();
+		List<Double> pricesPerRow = new ArrayList<>();
 
 		for (int r = 1; r <= totalRows; r++) {
+			System.out.println("Enter the number of seats in Row " + r + ": ");
+			int seatCount = Input.getInteger(100);
+			seatsPerRow.add(seatCount);
+
 			System.out.println("Enter the price for Row " + r + ": ");
 			double price = Input.getDouble(10000);
-
-			String seatType = price < 100 ? "Economy" : "Premium";
-
-			for (int c = 1; c <= totalCols; c++) {
-				String seatNumber = (char) ('A' + r - 1) + String.valueOf(c);
-				Seat seat = new Seat();
-				seat.setSeatNumber(seatNumber);
-				seat.setRowNumber(r);
-				seat.setColNumber(c);
-				seat.setSeatType(seatType);
-				seat.setSeatPrice(price);
-				seat.setSeatStatus(false); 
-				seats.add(seat);
-			}
+			pricesPerRow.add(price);
 		}
-		int totalSeats = totalRows;
 
-		System.out.println("Enter the Number of premiumRows ");
-		int numberPer = Input.getInteger(totalSeats);
-		int numberRegular;
-		totalSeats = totalSeats - numberPer;
-		if (totalSeats <= 0) {
-			numberRegular = 0;
-		} else {
-			System.out.println("Enter the Number of Regular : ");
-			numberRegular = Input.getInteger(totalSeats);
-		}
-		theatre.addScreen(seats, totalRows, totalCols, numberPer, numberRegular, true);
+		int screenId = theatre.getListOfScreen().size() + 1;
 
-		System.out.println("Screen Added Successfully with " + seats.size() + " seats!");
+		Screen screen = new Screen(screenId, seatsPerRow, pricesPerRow);
+
+		theatre.getListOfScreen().add(screen);
+
+		System.out.println("\n Screen " + screenId + " created successfully!");
+		System.out.println("Total Rows: " + totalRows);
+		System.out.println("Seat Layout:");
+		screen.displayLayout();
+
 	}
 
 	public void addNewTheatre(TheatreAdmin theatreAdmin) {
@@ -555,19 +537,21 @@ public class TheatreAdminService {
 		}
 
 		ArrayList<Screen> screen = new ArrayList<>();
+		Theatre newTheatre = new Theatre(theatreId, theatreName, theatreLocation, screen, new ArrayList<>(),
+				new ArrayList<>(), true);
+
 		int count = 1;
 		while (true) {
 			System.out.print("1 . Add Screen \n2 . Exit");
 			int currChoice = Input.getInteger(2);
 			if (currChoice == 1) {
-				screen.add(addScreen1(theatreAdmin,count));
+				screen.add(addScreen1(theatreAdmin, count, newTheatre));
 				count++;
 			} else {
 				break;
 			}
-
 		}
-		Theatre newTheatre = new Theatre(theatreId, theatreName, theatreLocation, screen, new ArrayList<>(),true);
+		newTheatre.setListOfScreen(screen);
 		long requestId = RequestTheatreDB.size() + 1;
 		RequestTheatreDB.put(requestId, new RequestTheatre(requestId, newTheatre, theatreAdmin, false));
 
@@ -575,7 +559,7 @@ public class TheatreAdminService {
 
 	}
 
-	public Screen addScreen1(TheatreAdmin theatreAdmin,int ScreenNumber) {
+	public Screen addScreen1(TheatreAdmin theatreAdmin, int ScreenNumber, Theatre theatre) {
 
 		System.out.println("Enter the Number of Rows (or Type '0' to Exit):");
 		int totalRows = Input.getInteger(10000);
@@ -583,51 +567,32 @@ public class TheatreAdminService {
 			System.out.println("------Back------");
 			return null;
 		}
-
-		System.out.println("Enter the Number of Columns (or Type '0' to Exit): ");
-		int totalCols = Input.getInteger(10000);
-		if (totalCols == 0) {
-			System.out.println("------Back------");
-			return null;
-		}
-
-		List<Seat> seats = new ArrayList<>();
+		List<Integer> seatsPerRow = new ArrayList<>();
+		List<Double> pricesPerRow = new ArrayList<>();
 
 		for (int r = 1; r <= totalRows; r++) {
+			System.out.println("Enter the number of seats in Row " + r + ": ");
+			int seatCount = Input.getInteger(100);
+			seatsPerRow.add(seatCount);
+
 			System.out.println("Enter the price for Row " + r + ": ");
 			double price = Input.getDouble(10000);
-
-			String seatType = price < 100 ? "Economy" : "Premium";
-			for (int c = 1; c <= totalCols; c++) {
-				String seatNumber = (char) ('A' + r - 1) + String.valueOf(c);
-				Seat seat = new Seat();
-				seat.setSeatNumber(seatNumber);
-				seat.setRowNumber(r);
-				seat.setColNumber(c);
-				seat.setSeatType(seatType);
-				seat.setSeatPrice(price);
-				seat.setSeatStatus(false); 
-				seats.add(seat);
-			}
+			pricesPerRow.add(price);
 		}
-		int totalSeats = totalRows;
 
-		System.out.println("Enter the Number of premiumRows ");
-		int numberPer = Input.getInteger(totalSeats);
-		int numberRegular;
-		totalSeats = totalSeats - numberPer;
-		if (totalSeats <= 0) {
-			numberRegular = 0;
-		} else {
-			System.out.println("Enter the Number of Regular : ");
-			numberRegular = Input.getInteger(totalSeats);
-		}
-	    Screen sc = new Screen(ScreenNumber,seats, totalRows, totalCols, numberPer, numberRegular, true);
+		int screenId = theatre.getListOfScreen().size() + 1;
 
-		return sc;
+		Screen screen = new Screen(screenId, seatsPerRow, pricesPerRow);
+
+		theatre.getListOfScreen().add(screen);
+
+		System.out.println("\n Screen " + screenId + " created successfully!");
+		System.out.println("Total Rows: " + totalRows);
+		System.out.println("Seat Layout:");
+		screen.displayLayout();
+		return screen;
+
 	}
-
-
 
 	public Theatre selectTheatre(List<Theatre> theatreList) {
 		if (theatreList == null || theatreList.isEmpty()) {
@@ -640,18 +605,17 @@ public class TheatreAdminService {
 		System.out.println("-----------------------------------------------------------");
 		int count = 1;
 		for (Theatre theatre : theatreList) {
-			if(theatre.isActive()==true) {
+			if (theatre.isActive() == true) {
 				System.out.printf("| %-8d | %-20s | %-20s |%n", count, theatre.getTheatreName(),
 						theatre.getTheatreLocation());
 				count++;
 			}
-			
-			
+
 		}
 		System.out.println("-----------------------------------------------------------");
 
 		System.out.print("Enter Theatre ID to select (or Type '0' to Exit): ");
-		Long theatreId = Input.getLong((long)count-1);
+		Long theatreId = Input.getLong((long) count - 1);
 		if (theatreId == 0) {
 			System.out.println("------Back------");
 			return null;
@@ -667,7 +631,6 @@ public class TheatreAdminService {
 		System.out.println("Invalid Theatre ID. Please try again.");
 		return null;
 	}
-	
 
 	public void AddTheatreToTheatreAdmin() {
 		adminService.viewAllTheatreAdmins();
@@ -687,7 +650,7 @@ public class TheatreAdminService {
 			return;
 		}
 		Theatre theatre = theatreDB.get(theatreId);
-		if(theatre.isActive()==false) {
+		if (theatre.isActive() == false) {
 			System.err.println("This Thatre Deleted , you can't assign permission");
 		}
 		if (theatreAdmin.getTheatre().contains(theatre)) {
@@ -708,29 +671,23 @@ public class TheatreAdminService {
 		String format = "| %-10s | %-25s | %-25s | %-15s | %-10s | %-15s |%n";
 
 		System.out.println(
-		    "+------------+---------------------------+---------------------------+-----------------+------------+-----------------+");
+				"+------------+---------------------------+---------------------------+-----------------+------------+-----------------+");
 		System.out.format(format, "Request ID", "Theatre Name", "Location", "Admin ID", "Approved", "Approved By");
 		System.out.println(
-		    "+------------+---------------------------+---------------------------+-----------------+------------+-----------------+");
+				"+------------+---------------------------+---------------------------+-----------------+------------+-----------------+");
 
 		for (RequestTheatre req : RequestTheatreDB.values()) {
-		    String approvedBy = (req.isApproved() && req.getApprovedAdmin() != null)
-		                        ? String.valueOf(req.getApprovedAdmin().getAdminId())
-		                        : "-";
+			String approvedBy = (req.isApproved() && req.getApprovedAdmin() != null)
+					? String.valueOf(req.getApprovedAdmin().getAdminId())
+					: "-";
 
-		    System.out.format(format, 
-		        req.getRequestId(),
-		        req.getTheatre().getTheatreName(),
-		        req.getTheatre().getTheatreLocation(),
-		        req.getTheatreAdmin().getTheatreAdminId(),
-		        req.isApproved() ? "Yes" : "No",
-		        approvedBy
-		    );
+			System.out.format(format, req.getRequestId(), req.getTheatre().getTheatreName(),
+					req.getTheatre().getTheatreLocation(), req.getTheatreAdmin().getTheatreAdminId(),
+					req.isApproved() ? "Yes" : "No", approvedBy);
 		}
 
 		System.out.println(
-		    "+------------+---------------------------+---------------------------+-----------------+------------+-----------------+");
-
+				"+------------+---------------------------+---------------------------+-----------------+------------+-----------------+");
 
 		while (true) {
 			System.out.println("Enter the Request id (or Type '0' to Exit): ");
@@ -779,7 +736,7 @@ public class TheatreAdminService {
 		if (theatre == null) {
 			return;
 		}
-		Movies movie=null;
+		Movies movie = null;
 		while (true) {
 			System.out.println("Enter the Show id (or type '0' to Exit): ");
 			long showId = Input.getLong(Long.MAX_VALUE);
@@ -790,26 +747,27 @@ public class TheatreAdminService {
 
 			if (listOfShow.get(showId) != null) {
 				flag = true;
-				if (showDB.get(showId).isActive() == true) {
+				if (showDB.get(showId).isActive().equalsIgnoreCase("upcoming")) {
 					for (Ticket ticket : ticketDB.values()) {
 						if (ticket.getShow().getShowId() == showId) {
 							cancelTicket(ticket.getUser(), ticket);
 						}
 					}
-					showDB.get(showId).setActive(false);
-					movie =showDB.get(showId).getMovie();
+					showDB.get(showId).setActive("Completed");
+					movie = showDB.get(showId).getMovie();
 					System.out.println("Show Cancelled");
-					boolean moviePresent=false;
-					for(Show show :theatre.getListOfShow()) {
-						if(show.getMovie()==movie && show.isActive()==true) {
+					boolean moviePresent = false;
+					for (Show show : theatre.getListOfShow()) {
+						if (show.getMovie() == movie && show.isActive().equalsIgnoreCase("upcoming")) {
+							System.out.println(show.getShowId());
 							moviePresent = true;
 							break;
 						}
 					}
-					if(moviePresent==false) {
-						movie.removeTheare(theatre);
-						System.err.println("There is only one show in this movie that was also cancelled now so Theatre is removed from movieTheatre List");
+					if (moviePresent == false) {
+						theatre.removeMovieFromList(movie);
 					}
+
 				} else {
 					System.err.println("Show Already Cancelled");
 				}
@@ -835,10 +793,10 @@ public class TheatreAdminService {
 			System.err.println("Ticket is already cancelled.");
 			return;
 		}
-		
+
 		ticket.setStatus("Refunded");
 		for (Seat seat : ticket.getSeats()) {
-			seat.setSeatStatus(false);
+			seat.setBooked(false);
 		}
 
 		double totalAmount = ticket.getTotalAmount();
@@ -858,7 +816,7 @@ public class TheatreAdminService {
 			return null;
 		}
 		HashMap<Long, Show> listOfShow = new HashMap<>();
-		
+
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm").withZone(ZoneId.of(timeZone));
 		System.out.println(
 				"+---------+-------------------+---------------------------+-----------+----------------------+");
@@ -870,7 +828,8 @@ public class TheatreAdminService {
 		for (Map.Entry<Long, Show> entry : showDB.entrySet()) {
 			Show s = entry.getValue();
 			if (s.getTheatre().getTheatreId() == theatre.getTheatreId()
-					&& s.getDateTimeEpoch() > Instant.now().getEpochSecond() && s.isActive() == true) {
+					&& s.getDateTimeEpoch() > Instant.now().getEpochSecond()
+					&& s.isActive().equalsIgnoreCase("upcoming")) {
 				String dateTime = formatter.format(Instant.ofEpochSecond(s.getDateTimeEpoch()));
 				System.out.printf("| %-7d | %-17s | %-22s | %-9s | %-20s |\n", s.getShowId(),
 						s.getTheatre().getTheatreName(), s.getMovie().getMovieTitle(), s.getScreen().getScreenNumber(),
@@ -891,11 +850,11 @@ public class TheatreAdminService {
 		Screen screen = selectScreen(theatre);
 		if (screen == null)
 			return;
-		
-		for(Theatre the: theatreDB.values()) {
-			if(the.getListOfScreen().contains(screen)) {
-				for(Screen s: the.getListOfScreen()) {
-					if(s==screen) {
+
+		for (Theatre the : theatreDB.values()) {
+			if (the.getListOfScreen().contains(screen)) {
+				for (Screen s : the.getListOfScreen()) {
+					if (s == screen) {
 						s.setActive(false);
 					}
 				}
@@ -913,26 +872,27 @@ public class TheatreAdminService {
 		}
 		List<Integer> list = new ArrayList<>();
 		for (Screen s : listOfScreen) {
-			if(s.isActive()==true) {
+			if (s.isActive() == true) {
 				list.add(s.getScreenNumber());
 			}
-			
+
 		}
 		while (true) {
-			boolean flag =false;
+			boolean flag = false;
 			System.out.println("Available Screen : " + list);
 			System.out.println("Enter Screen Number (or type '0' to Exit): ");
-			int size = listOfScreen.size();
+//			int size = listOfScreen.size();
 			int screenNumber = Input.getInteger(30);
 			if (screenNumber == 0) {
 				return null;
 			}
 			for (Screen s : listOfScreen) {
 				if (s.getScreenNumber() == screenNumber) {
-					flag=true;
+					flag = true;
 					return s;
 				}
-			}if(flag==false) {
+			}
+			if (flag == false) {
 				System.err.println("Invalid Screen Number");
 			}
 		}
@@ -956,14 +916,180 @@ public class TheatreAdminService {
 	}
 
 	public void deleteTheatre(TheatreAdmin theatreAdmin) {
-		Theatre theatre= selectTheatre(theatreAdmin.getTheatre());
-		if(theatre==null) {
+		Theatre theatre = selectTheatre(theatreAdmin.getTheatre());
+		if (theatre == null) {
 			System.out.println("No Thetare Available");
 			return;
 		}
 		theatre.setActive(false);
 		theatreAdmin.removeTheatre(theatre);
 		System.out.println("Theatre Deleted ");
-		
+
 	}
+
+	public void displayAllTicket(String timeZone) {
+		// TODO Auto-generated method stub
+		TicketService tc = new TicketService();
+		tc.changeTicketStatus();
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd MMM yyyy, hh:mm a");
+		System.out.printf(
+				"+----+----------------------+----------------------+--------+----------------------+-----------------------+----------------------+%n");
+		System.out.printf(
+				"| ID | Movie                | Theatre              | Screen | Show Date & Time     |  Status               | Seats                |%n");
+		System.out.printf(
+				"+----+----------------------+----------------------+--------+----------------------+-----------------------+----------------------+%n");
+
+		for (Ticket ticket : ticketDB.values()) {
+
+			List<String> seatNumber = ticket.getSeats().stream().map(s -> s.getSeatNumber())
+					.collect(Collectors.toList());
+			ZonedDateTime zdt = Instant.ofEpochSecond(ticket.getShow().getDateTimeEpoch()).atZone(ZoneId.of(timeZone));
+
+			String active = ticket.getStatus();
+
+			System.out.printf("| %-2d | %-20s | %-20s | %-6s | %-20s | %-20s | %-20s |%n", ticket.getTicketId(),
+					ticket.getMovie().getMovieTitle(), ticket.getTheatre().getTheatreName(),
+					ticket.getShow().getScreen().getScreenNumber(), zdt.format(formatter), active, seatNumber);
+		}
+		System.out.printf(
+				"+----+----------------------+----------------------+--------+----------------------+-----------------------+----------------------+%n");
+	}
+
+	public void printRunningShow(TheatreAdmin theatreAdmin, String timeZone) {
+		if (theatreAdmin == null || theatreAdmin.getTheatre() == null) {
+			System.err.println("No Theatre Available");
+			return;
+		}
+
+		List<Theatre> theatreList = theatreAdmin.getTheatre();
+		Theatre theatre = selectTheatre(theatreList);
+
+		if (theatre == null) {
+			System.out.println("------Back------");
+			return;
+		}
+
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm").withZone(ZoneId.of(timeZone));
+
+		List<Show> futureShows = new ArrayList<>();
+		long currentEpoch = Instant.now().getEpochSecond();
+
+		for (Map.Entry<Long, Show> entry : showDB.entrySet()) {
+			Show s = entry.getValue();
+			if (s.getTheatre().getTheatreId() == theatre.getTheatreId() && s.isActive().equalsIgnoreCase("Running")) {
+				futureShows.add(s);
+			}
+		}
+		if (futureShows.isEmpty() || futureShows == null) {
+			System.err.println("No Running Show");
+			return;
+		}
+
+		futureShows.sort(Comparator.comparingLong(Show::getDateTimeEpoch));
+
+		System.out.println(
+				"+---------+-------------------+---------------------------+-----------+----------------------+-----------+");
+		System.out.println(
+				"| Show ID | Theatre           | Movie                     | Screen    | Date & Time          | Status    |");
+		System.out.println(
+				"+---------+-------------------+---------------------------+-----------+----------------------+-----------+");
+
+		for (Show s : futureShows) {
+			String dateTime = formatter.format(Instant.ofEpochSecond(s.getDateTimeEpoch()));
+			String status = s.isActive(); // Upcoming / Completed / Running
+
+			System.out.printf("| %-7d | %-17s | %-25s | %-9s | %-20s | %-9s |\n", s.getShowId(),
+					s.getTheatre().getTheatreName(), s.getMovie().getMovieTitle(), s.getScreen().getScreenNumber(),
+					dateTime, status);
+		}
+
+		System.out.println(
+				"+---------+-------------------+---------------------------+-----------+----------------------+-----------+");
+	}
+
+	public void displayAllRunningShow(String timeZone) {
+
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm").withZone(ZoneId.of(timeZone));
+
+		System.out.println(
+				"+---------+--------------------------+------------------------+-----------+-------------------+-----------+");
+		System.out.println(
+				"| Show ID | Theatre                  | Movie                  | Screen    | Date & Time       | Status    |");
+		System.out.println(
+				"+---------+--------------------------+------------------------+-----------+-------------------+-----------+");
+
+		for (Map.Entry<Long, Show> entry : showDB.entrySet()) {
+			Show s = entry.getValue();
+			if (s.isActive().equalsIgnoreCase("Running")) {
+				String dateTime = formatter.format(Instant.ofEpochSecond(s.getDateTimeEpoch()));
+
+				System.out.printf("| %-7d | %-20s | %-26s | %-9s | %-17s | %-9s |\n", s.getShowId(),
+						s.getTheatre().getTheatreName(), s.getMovie().getMovieTitle(), s.getScreen().getScreenNumber(),
+						dateTime, s.isActive());
+			}
+
+		}
+
+		System.out.println(
+				"+---------+--------------------------+------------------------+-----------+-------------------+-----------+");
+
+	}
+
+	public void viewSeatAllocationForPastShows(TheatreAdmin theatreAdmin) {
+		Theatre theatre = selectTheatre(theatreAdmin.getTheatre());
+		if (theatre == null)
+			return;
+		Show show = displayPastShow(theatre, theatreAdmin.getTimeZone());
+		if (show == null) {
+			return;
+		}
+		ticketServiceObj.displaySeatsByCategory(show);
+
+	}
+
+	private Show displayPastShow(Theatre theatre, String timeZone) {
+		HashMap<Long, Show> pastShow = new HashMap<>();
+		for (Show show : showDB.values()) {
+			if (show.getTheatre() == theatre && show.isActive().equalsIgnoreCase("completed")) {
+				pastShow.put(show.getShowId(), show);
+			}
+		}
+		if(pastShow.isEmpty()) {
+			System.err.println("No Past Show Available");
+			return null;
+		}
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm").withZone(ZoneId.of(timeZone));
+
+		System.out.println(
+				"+---------+--------------------------+------------------------+-----------+-------------------+-----------+");
+		System.out.println(
+				"| Show ID | Theatre                  | Movie                  | Screen    | Date & Time       | Status    |");
+		System.out.println(
+				"+---------+--------------------------+------------------------+-----------+-------------------+-----------+");
+
+		for (Show s : pastShow.values()) {
+
+			String dateTime = formatter.format(Instant.ofEpochSecond(s.getDateTimeEpoch()));
+
+			System.out.printf("| %-7d | %-20s | %-26s | %-9s | %-17s | %-9s |\n", s.getShowId(),
+					s.getTheatre().getTheatreName(), s.getMovie().getMovieTitle(), s.getScreen().getScreenNumber(),
+					dateTime, s.isActive());
+		}
+
+		System.out.println(
+				"+---------+--------------------------+------------------------+-----------+-------------------+-----------+");
+
+		System.out.println("Enter Show Id (or type '0' to Exit):");
+		long showId = Input.getLong((long) showDB.size());
+		if (showId == 0) {
+			return null;
+		}
+		Show show = pastShow.get(showId);
+		if (show == null) {
+			return null;
+		}
+		return show;
+
+	}
+
 }
