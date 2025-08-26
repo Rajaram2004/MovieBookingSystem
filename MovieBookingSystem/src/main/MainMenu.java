@@ -6,7 +6,7 @@ import java.util.Scanner;
 import model.Admin;
 import model.TheatreAdmin;
 import model.Ticket;
-import model.User;
+import model.Customer;
 import repository.InMemoryDatabase;
 import service.AdminService;
 import service.MovieService;
@@ -36,7 +36,7 @@ public class MainMenu {
 			break;
 		case 1:
 
-			User user = null;
+			Customer user = null;
 			int num1 = printloginRegister();
 			if (num1 == 1) {
 				user = callUser();
@@ -119,14 +119,14 @@ public class MainMenu {
 		return foundUser;
 	}
 
-	private static User callUser() { // 0
+	private static Customer callUser() { // 0
 
 		System.out.println("-----------------------------------------------------------------");
 		System.out.println("|                        Login                                   |");
 		System.out.println("-----------------------------------------------------------------");
 		Scanner sc = Input.getScanner();
-		HashMap<Long, User> userDB = InMemoryDatabase.getUserDB();
-		User foundUser = null;
+		HashMap<Long, Customer> userDB = InMemoryDatabase.getUserDB();
+		Customer foundUser = null;
 		boolean flag = false;
 		while (true) {
 			System.out.print("Enter Your Phone Number or Email Id (or type '0' to Exit): ");
@@ -134,7 +134,7 @@ public class MainMenu {
 			if (input.equalsIgnoreCase("0")) {
 				return null;
 			}
-			for (User u : userDB.values()) {
+			for (Customer u : userDB.values()) {
 				if (String.valueOf(u.getUserPhoneNumber()).equals(input)
 						|| u.getUserEmailId().equalsIgnoreCase(input)) {
 					flag = true;
@@ -276,9 +276,9 @@ public class MainMenu {
 
 	public static void createNewUser() {
 		Scanner sc = Input.getScanner();
-		HashMap<Long, User> userDB = InMemoryDatabase.getUserDB();
+		HashMap<Long, Customer> userDB = InMemoryDatabase.getUserDB();
 
-		User newUser = new User();
+		Customer newUser = new Customer();
 		Long newUserId = (long) (userDB.size() + 1);
 		newUser.setUserId(newUserId);
 
@@ -298,7 +298,7 @@ public class MainMenu {
 			String email = sc.nextLine().trim();
 			if (email.matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$")) {
 				boolean exists = false;
-				for (User u : userDB.values()) {
+				for (Customer u : userDB.values()) {
 					if (u.getUserEmailId().equalsIgnoreCase(email)) {
 						exists = true;
 						break;
@@ -321,7 +321,7 @@ public class MainMenu {
 				long phoneNum = Long.parseLong(phone);
 
 				boolean exists = false;
-				for (User u : userDB.values()) {
+				for (Customer u : userDB.values()) {
 					if (u.getUserPhoneNumber() == phoneNum) {
 						exists = true;
 						break;

@@ -19,10 +19,10 @@ import model.Show;
 import model.Theatre;
 import model.TheatreAdmin;
 import model.Ticket;
-import model.User;
+import model.Customer;
 
 public class InMemoryDatabase {
-	static HashMap<Long, User> userDB = new HashMap<>();
+	static HashMap<Long, Customer> userDB = new HashMap<>();
 	static HashMap<Long, TheatreAdmin> theatreAdminDB = new HashMap<>();
 	static HashMap<Long, Admin> adminDB = new HashMap<>();
 	static HashMap<Long, Theatre> theatreDB = new HashMap<>();
@@ -34,12 +34,12 @@ public class InMemoryDatabase {
 	public InMemoryDatabase() {
 		userDB = InMemoryDatabase.getUserDB();
 		userDB.put(1L,
-				new User(1L, "User 1", "user1@example.com", 987654321L, "Chennai", "pass123", 2000, "Asia/Kolkata"));
+				new Customer(1L, "User 1", "user1@example.com", 987654321L, "Chennai", "pass123", 2000, "Asia/Kolkata"));
 		userDB.put(2L,
-				new User(2L, "User 2", "user2@example.com", 123456789L, "Bangalore", "pass456", 20000, "Asia/Kolkata"));
+				new Customer(2L, "User 2", "user2@example.com", 123456789L, "Bangalore", "pass456", 20000, "Asia/Kolkata"));
 		userDB.put(3L,
-				new User(3L, "User 3", "user3@example.com", 912345678L, "Mumbai", "pass789", 20000, "Asia/Kolkata"));
-		userDB.put(4L, new User(4L, "User 4", "user4@example.com", 123456L, "Mumbai", "1", 20000, "Asia/Kolkata"));
+				new Customer(3L, "User 3", "user3@example.com", 912345678L, "Mumbai", "pass789", 20000, "Asia/Kolkata"));
+		userDB.put(4L, new Customer(4L, "User 4", "user4@example.com", 123456L, "Mumbai", "1", 20000, "Asia/Kolkata"));
 
 		theatreAdminDB.put(1L, new TheatreAdmin(1L, "Admin One", "theatreadmin1@example.com", 987654321L, "pass123",
 				new ArrayList<>(), "Asia/Kolkata"));
@@ -193,12 +193,13 @@ public class InMemoryDatabase {
 
 		List<Theatre> theatres = new ArrayList<>();
 		for (int t = 0; t < theatreNames.length; t++) {
+			Theatre theatre = null;
 			List<Screen> screens = new ArrayList<>();
 			for (int s = 1; s <= 3; s++) {
-				screens.add(new Screen(s, seatsPerRow, pricePerRow));
+				screens.add(new Screen(s,theatre, seatsPerRow, pricePerRow));
 			}
 
-			Theatre theatre = new Theatre(1L + t, theatreNames[t], theatreCities[t], screens, new ArrayList<>(),
+			 theatre = new Theatre(1L + t, theatreNames[t], theatreCities[t], screens, new ArrayList<>(),
 					new ArrayList<>(), true);
 
 			theatres.add(theatre);
@@ -318,34 +319,22 @@ public class InMemoryDatabase {
 
 		theatreAdminDB.get(3L).addTheatre(theatreDB.get(5L));
 		theatreAdminDB.get(3L).addTheatre(theatreDB.get(6L));
-
+		
 		createDummyTickets();
 
 	}
 
-	private void createDummyTickets() {
-		User user1 = userDB.get(1L);
-		User user2 = userDB.get(2L);
-		User user3 = userDB.get(3L);
-
-		Theatre theatre1 = theatreDB.get(1L);
-		Theatre theatre2 = theatreDB.get(2L);
-		Theatre theatre3 = theatreDB.get(3L);
-		Theatre theatre4 = theatreDB.get(4L);
-		Theatre theatre5 = theatreDB.get(5L);
-
-		Movies movie1 = movieDB.get(1L);
-		Movies movie2 = movieDB.get(2L);
-		Movies movie3 = movieDB.get(3L);
-		Movies movie4 = movieDB.get(4L);
-		Movies movie5 = movieDB.get(5L);
-
+	private void createDummyTickets(){
+		Customer user1 = userDB.get(1L);
+		Customer user2 = userDB.get(2L);
+		Customer user3 = userDB.get(3L);
+		
 		Show show91 = showDB.get(91L);
 		Show show92 = showDB.get(92L);
 		Show show93 = showDB.get(93L);
 		Show show94 = showDB.get(94L);
 		Show show95 = showDB.get(95L);
-
+		
 		// Ticket 1
 
 		List<List<Seat>> seatShow91 = show91.getShowSeats();
@@ -358,7 +347,7 @@ public class InMemoryDatabase {
 				}
 			}
 		}
-		Ticket ticket1 = new Ticket(1L, user1, movie1, theatre1, show91, seats1, show91.getDateTimeEpoch(), 400.0,
+		Ticket ticket1 = new Ticket(1L, user1, show91, seats1, 400.0,
 				"Upcoming");
 		ticketDB.put(1L, ticket1);
 
@@ -373,7 +362,7 @@ public class InMemoryDatabase {
 				}
 			}
 		}
-		Ticket ticket2 = new Ticket(2L, user2, movie2, theatre2, show92, seats2, show92.getDateTimeEpoch(), 250.0,
+		Ticket ticket2 = new Ticket(2L, user2, show92, seats2,  250.0,
 				"Upcoming");
 		ticketDB.put(2L, ticket2);
 
@@ -389,7 +378,7 @@ public class InMemoryDatabase {
 				}
 			}
 		}
-		Ticket ticket3 = new Ticket(3L, user3, movie3, theatre3, show93, seats3, show93.getDateTimeEpoch(), 900.0,
+		Ticket ticket3 = new Ticket(3L, user3, show93, seats3,  900.0,
 				"Upcoming");
 		ticketDB.put(3L, ticket3);
 
@@ -405,7 +394,7 @@ public class InMemoryDatabase {
 				}
 			}
 		}
-		Ticket ticket4 = new Ticket(4L, user1, movie4, theatre4, show94, seats4, show94.getDateTimeEpoch(), 180.0,
+		Ticket ticket4 = new Ticket(4L, user1, show94, seats4,  180.0,
 				"Upcoming");
 		ticketDB.put(4L, ticket4);
 
@@ -421,7 +410,7 @@ public class InMemoryDatabase {
 				}
 			}
 		}
-		Ticket ticket5 = new Ticket(5L, user2, movie5, theatre5, show95, seats5, show95.getDateTimeEpoch(), 440.0,
+		Ticket ticket5 = new Ticket(5L, user2, show95, seats5,  440.0,
 				"Upcoming");
 		ticketDB.put(5L, ticket5);
 
@@ -436,7 +425,7 @@ public class InMemoryDatabase {
 				}
 			}
 		}
-		Ticket ticket6 = new Ticket(6L, user3, movie1, theatre1, show91, seats6, show91.getDateTimeEpoch(), 200.0,
+		Ticket ticket6 = new Ticket(6L, user3, show91, seats6,  200.0,
 				"Upcoming");
 		ticketDB.put(6L, ticket6);
 
@@ -450,7 +439,7 @@ public class InMemoryDatabase {
 				}
 			}
 		}
-		Ticket ticket7 = new Ticket(7L, user1, movie2, theatre2, show92, seats7, show92.getDateTimeEpoch(), 520.0,
+		Ticket ticket7 = new Ticket(7L, user1, show92, seats7,  520.0,
 				"Upcoming");
 		ticketDB.put(7L, ticket7);
 
@@ -464,7 +453,7 @@ public class InMemoryDatabase {
 				}
 			}
 		}
-		Ticket ticket8 = new Ticket(8L, user2, movie3, theatre3, show93, seats8, show93.getDateTimeEpoch(), 300.0,
+		Ticket ticket8 = new Ticket(8L, user2, show93, seats8,  300.0,
 				"Upcoming");
 		ticketDB.put(8L, ticket8);
 
@@ -478,7 +467,7 @@ public class InMemoryDatabase {
 				}
 			}
 		}
-		Ticket ticket9 = new Ticket(9L, user3, movie4, theatre4, show94, seats9, show94.getDateTimeEpoch(), 420.0,
+		Ticket ticket9 = new Ticket(9L, user3, show94, seats9, 420.0,
 				"Upcoming");
 		ticketDB.put(9L, ticket9);
 
@@ -492,7 +481,7 @@ public class InMemoryDatabase {
 				}
 			}
 		}
-		Ticket ticket10 = new Ticket(10L, user1, movie5, theatre5, show95, seats10, show95.getDateTimeEpoch(), 280.0,
+		Ticket ticket10 = new Ticket(10L, user1, show95, seats10, 280.0,
 				"Upcoming");
 		ticketDB.put(10L, ticket10);
 	}
@@ -520,11 +509,11 @@ public class InMemoryDatabase {
 		}
 	}
 
-	public static HashMap<Long, User> getUserDB() {
+	public static HashMap<Long, Customer> getUserDB() {
 		return userDB;
 	}
 
-	public static void setUserDB(HashMap<Long, User> userDB) {
+	public static void setUserDB(HashMap<Long, Customer> userDB) {
 		InMemoryDatabase.userDB = userDB;
 	}
 

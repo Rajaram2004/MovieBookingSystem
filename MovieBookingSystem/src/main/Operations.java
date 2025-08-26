@@ -8,7 +8,7 @@ import model.Movies;
 import model.Show;
 import model.Theatre;
 import model.Ticket;
-import model.User;
+import model.Customer;
 import repository.InMemoryDatabase;
 import service.MovieService;
 import service.TheatreService;
@@ -18,7 +18,7 @@ import util.TimeZoneConverter;
 
 public class Operations {
 
-	public static void operation(User user, TicketService ticketServiceObj, MovieService movieServiceObj,
+	public static void operation(Customer user, TicketService ticketServiceObj, MovieService movieServiceObj,
 			TheatreService theatreServiceObj, HashMap<Long, Ticket> ticketDB) {
 		int userChoice = Features();
 		String timeZone = user.getTimeZone();
@@ -121,7 +121,7 @@ public class Operations {
 		}
 	}
 
-	private static void BookTicketViaTheatre(TheatreService theatreServiceObj,TicketService ticketServiceObj,User user) {
+	private static void BookTicketViaTheatre(TheatreService theatreServiceObj,TicketService ticketServiceObj,Customer user) {
 		theatreServiceObj.printAllTheatres();
 		HashMap<Long,Theatre> theatreDB = InMemoryDatabase.getTheatreDB();
 		Theatre theatre=null;

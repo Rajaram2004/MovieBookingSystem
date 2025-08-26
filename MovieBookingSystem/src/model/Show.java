@@ -102,9 +102,6 @@ public class Show {
 		return movie;
 	}
 
-	public void setMovie(Movies movie) {
-		this.movie = movie;
-	}
 
 	public Screen getScreen() {
 		return screen;

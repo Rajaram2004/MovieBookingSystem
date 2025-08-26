@@ -5,15 +5,20 @@ import java.util.List;
 
 public class Screen {
 	private int screenNumber;
+	private Theatre theatre;
 	private List<List<Seat>> seatsLayout;
-	private List<Double> price;
 	private boolean isActive;
 
-	public Screen(int screenId, List<Integer> seatsPerRow, List<Double> price) {
+	public Screen(int screenId, Theatre theatre, List<Integer> seatsPerRow, List<Double> price) {
 		this.screenNumber = screenId;
+		this.theatre = theatre;
 		isActive = true;
 		this.seatsLayout = new ArrayList<>();
 		createSeats(seatsPerRow, price);
+	}
+
+	public Theatre getTheatre() {
+		return theatre;
 	}
 
 	private void createSeats(List<Integer> seatsPerRow, List<Double> price) {
@@ -38,14 +43,6 @@ public class Screen {
 
 	public void setActive(boolean isActive) {
 		this.isActive = isActive;
-	}
-
-	public void setScreenId(int screenId) {
-		this.screenNumber = screenId;
-	}
-
-	public void setSeatsLayout(List<List<Seat>> seatsLayout) {
-		this.seatsLayout = seatsLayout;
 	}
 
 	public List<List<Seat>> getSeatsLayout() {
@@ -78,11 +75,4 @@ public class Screen {
 		System.out.println("\nLegend: [Available]  [X = Booked]");
 	}
 
-	public List<Double> getPrice() {
-		return price;
-	}
-
-	public void setPrice(List<Double> price) {
-		this.price = price;
-	}
 }

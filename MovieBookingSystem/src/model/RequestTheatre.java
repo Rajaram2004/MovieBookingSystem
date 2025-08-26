@@ -31,16 +31,8 @@ public class RequestTheatre {
 		return requestId;
 	}
 
-	public void setRequestId(Long requestId) {
-		this.requestId = requestId;
-	}
-
 	public Theatre getTheatre() {
 		return theatre;
-	}
-
-	public void setTheatre(Theatre theatre) {
-		this.theatre = theatre;
 	}
 
 	public boolean isApproved() {
@@ -53,10 +45,6 @@ public class RequestTheatre {
 
 	public TheatreAdmin getTheatreAdmin() {
 		return theatreAdmin;
-	}
-
-	public void setTheatreAdmin(TheatreAdmin theatreAdmin) {
-		this.theatreAdmin = theatreAdmin;
 	}
 
 }

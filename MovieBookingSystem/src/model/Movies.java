@@ -10,14 +10,12 @@ public class Movies {
 	private int releaseYear;
 
 	public Movies(Long movieId, String movieTitle, int duration, String genre, String language, int releaseYear) {
-		
 		this.movieId = movieId;
 		this.movieTitle = movieTitle;
 		this.duration = duration;
 		this.genre = genre;
 		this.language = language;
 		this.releaseYear = releaseYear;
-	
 	}
 
 	public int getReleaseYear() {

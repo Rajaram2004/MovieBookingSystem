@@ -26,24 +26,14 @@ public class Seat {
 		}
 	}
 
-	public void unBookSeat() {
-		this.isBooked = false; 
-	}
-
 	public String getSeatNumber() {
 		return seatNumber;
 	}
 
-	public void setSeatNumber(String seatNumber) {
-		this.seatNumber = seatNumber;
-	}
+
 
 	public double getPrice() {
 		return price;
-	}
-
-	public void setPrice(double price) {
-		this.price = price;
 	}
 
 	public boolean isBooked() {

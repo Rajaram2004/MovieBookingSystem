@@ -1,15 +1,15 @@
 package model;
 
-public class Admin extends UserDetails{
+public class Admin extends User{
 
 	public Admin(Long adminId, String adminName, String adminEmailId, Long adminPhoneNumber, String adminPassword,
 			String timeZone) {
 		
-		this.Id = adminId;
-		this.Name = adminName;
-		this.EmailId = adminEmailId;
-		this.PhoneNumber = adminPhoneNumber;
-		this.Password = adminPassword;
+		this.id = adminId;
+		this.name = adminName;
+		this.emailId = adminEmailId;
+		this.phoneNumber = adminPhoneNumber;
+		this.password = adminPassword;
 		this.timeZone = timeZone;
 	}
 	public String getTimeZone() {
@@ -19,34 +19,34 @@ public class Admin extends UserDetails{
 		this.timeZone = timeZone;
 	}
 	public Long getAdminId() {
-		return Id;
+		return id;
 	}
 	public void setAdminId(Long adminId) {
-		this.Id = adminId;
+		this.id = adminId;
 	}
 	public String getAdminName() {
-		return Name;
+		return name;
 	}
 	public void setAdminName(String adminName) {
-		this.Name = adminName;
+		this.name = adminName;
 	}
 	public String getAdminEmailId() {
-		return EmailId;
+		return emailId;
 	}
 	public void setAdminEmailId(String adminEmailId) {
-		this.EmailId = adminEmailId;
+		this.emailId = adminEmailId;
 	}
 	public Long getAdminPhoneNumber() {
-		return PhoneNumber;
+		return phoneNumber;
 	}
 	public void setAdminPhoneNumber(Long adminPhoneNumber) {
-		this.PhoneNumber = adminPhoneNumber;
+		this.phoneNumber = adminPhoneNumber;
 	}
 	public String getAdminPassword() {
-		return Password;
+		return password;
 	}
 	public void setAdminPassword(String adminPassword) {
-		this.Password = adminPassword;
+		this.password = adminPassword;
 	}
 	
 }

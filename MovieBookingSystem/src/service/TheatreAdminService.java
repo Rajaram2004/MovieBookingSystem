@@ -23,7 +23,7 @@ import model.Show;
 import model.Theatre;
 import model.TheatreAdmin;
 import model.Ticket;
-import model.User;
+import model.Customer;
 import repository.InMemoryDatabase;
 import util.Input;
 
@@ -491,7 +491,7 @@ public class TheatreAdminService {
 
 		int screenId = theatre.getListOfScreen().size() + 1;
 
-		Screen screen = new Screen(screenId, seatsPerRow, pricesPerRow);
+		Screen screen = new Screen(screenId, theatre, seatsPerRow, pricesPerRow);
 
 		theatre.getListOfScreen().add(screen);
 
@@ -582,7 +582,7 @@ public class TheatreAdminService {
 
 		int screenId = theatre.getListOfScreen().size() + 1;
 
-		Screen screen = new Screen(screenId, seatsPerRow, pricesPerRow);
+		Screen screen = new Screen(screenId,theatre, seatsPerRow, pricesPerRow);
 
 		theatre.getListOfScreen().add(screen);
 
@@ -782,7 +782,7 @@ public class TheatreAdminService {
 		}
 	}
 
-	public void cancelTicket(User currentUser, Ticket ticket) {
+	public void cancelTicket(Customer currentUser, Ticket ticket) {
 
 		if (ticket == null || !ticket.getUser().equals(currentUser)) {
 			System.err.println("No ticket found with this ID for your account.");

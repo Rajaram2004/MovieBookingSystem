@@ -20,7 +20,7 @@ import model.Show;
 import model.Theatre;
 import model.TheatreAdmin;
 import model.Ticket;
-import model.User;
+import model.Customer;
 import repository.InMemoryDatabase;
 import util.Input;
 
@@ -35,7 +35,7 @@ public class TicketService {
 
 	// ------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-	public void bookTicket(User user, String timeZone, HashMap<Long, Ticket> ticketDB) {
+	public void bookTicket(Customer user, String timeZone, HashMap<Long, Ticket> ticketDB) {
 
 		Movies movieObj = selectMovie();
 		if (movieObj == null) {
@@ -64,7 +64,6 @@ public class TicketService {
 			return;
 		}
 		double amount = calculateAmount(selectSeat);
-		long bookedEpoch = show.getDateTimeEpoch();
 		double currBalance = user.getBalance();
 		
 		if (currBalance < amount) {
@@ -85,8 +84,8 @@ public class TicketService {
 		currBalance -= amount;
 		user.setBalance(currBalance);
 		System.out.println("New Available Balance is " + user.getBalance());
-		Ticket ticket = new Ticket((long) (ticketDB.size() + 1), user, movieObj, theatreObj, show, selectSeat,
-				bookedEpoch, amount, "Upcoming");
+		Ticket ticket = new Ticket((long) (ticketDB.size() + 1), user, show, selectSeat,
+			 amount, "Upcoming");
 		ticketDB.put((long) (ticketDB.size() + 1), ticket);
 		System.out.println("Your Ticket Successfully Booked");
 		TicketStatus(ticket, user.getTimeZone(), user);
@@ -405,7 +404,7 @@ public class TicketService {
 		return total;
 	}
 
-	public void checkTicketStatus(String timeZone, User user) {
+	public void checkTicketStatus(String timeZone, Customer user) {
 		if (ticketDB.isEmpty()) {
 			System.err.println("No Tickets Available");
 			return;
@@ -445,7 +444,7 @@ public class TicketService {
 		System.out.println("========================================================\n");
 	}
 
-	public void TicketStatus(Ticket ticket, String timeZone, User user) {
+	public void TicketStatus(Ticket ticket, String timeZone, Customer user) {
 
 		if (ticket == null) {
 			System.err.println("No ticket ");
@@ -473,7 +472,7 @@ public class TicketService {
 		System.out.println("========================================================\n");
 	}
 
-	public void viewMyBooking(User currentUser, String timeZone) {
+	public void viewMyBooking(Customer currentUser, String timeZone) {
 		
 		List<Ticket> userTickets = ticketDB.values().stream().filter(t -> t.getUser().equals(currentUser))
 				.collect(Collectors.toList());
@@ -516,7 +515,7 @@ public class TicketService {
 		}
 	}
 
-	public void cancelTicket(User currentUser) {
+	public void cancelTicket(Customer currentUser) {
 		System.out.println("----------- Ticket Cancellation Policy -----------");
 		System.out.println("1. Cancel 24 hours before the show → 75% refund");
 		System.out.println("2. Cancel between 2 hours and 24 hours before → 50% refund");
@@ -608,7 +607,7 @@ public class TicketService {
 		System.out.println("Ticket ID " + ticketId + " has been successfully cancelled.");
 	}
 
-	private List<Ticket> displayUpcomingTicket(User currentUser) {
+	private List<Ticket> displayUpcomingTicket(Customer currentUser) {
 		boolean found = false;
 
 		String line = "+-------+----------------------+-----------------+---------------+----------------------+------------+------------+";
@@ -716,7 +715,7 @@ public class TicketService {
 		System.out.println(list);
 	}
 
-	public void bookTicketViaTheatre(List<Movies> listOfMovies, Theatre theatreObj, User user, String timeZone) {
+	public void bookTicketViaTheatre(List<Movies> listOfMovies, Theatre theatreObj, Customer user, String timeZone) {
 
 		Movies movieObj = getMovieFromTheatre(listOfMovies);
 		if (movieObj == null) {
@@ -756,8 +755,8 @@ public class TicketService {
 		currBalance -= amount;
 		user.setBalance(currBalance);
 		System.out.println("New Available Balance is " + user.getBalance());
-		Ticket ticket = new Ticket((long) (ticketDB.size() + 1), user, movieObj, theatreObj, show, selectSeat,
-				bookedEpoch, amount, "Upcoming");
+		Ticket ticket = new Ticket((long) (ticketDB.size() + 1), user, show, selectSeat,
+				amount, "Upcoming");
 		ticketDB.put((long) (ticketDB.size() + 1), ticket);
 		System.out.println("Your Ticket Successfully Booked");
 		TicketStatus(ticket, user.getTimeZone(), user);

@@ -17,13 +17,13 @@ import model.Movies;
 import model.Show;
 import model.Theatre;
 import model.TheatreAdmin;
-import model.User;
+import model.Customer;
 import repository.InMemoryDatabase;
 import util.Input;
 import util.TimeZoneConverter;
 
 public class AdminService {
-	static HashMap<Long, User> userDB = InMemoryDatabase.getUserDB();
+	static HashMap<Long, Customer> userDB = InMemoryDatabase.getUserDB();
 	static HashMap<Long, TheatreAdmin> theatreAdminDB = InMemoryDatabase.getTheatreAdminDB();
 	static HashMap<Long, Movies> movieDB = InMemoryDatabase.getMovieDB();
 	static HashMap<Long, Theatre> theatreDB = InMemoryDatabase.getTheatreDB();
@@ -50,7 +50,7 @@ public class AdminService {
 				"Preferred Location", "Balance");
 		System.out.println(
 				"----------------------------------------------------------------------------------------------------------------------");
-		for (User user : userDB.values()) {
+		for (Customer user : userDB.values()) {
 			System.out.printf("| %-8d | %-20s | %-25s | %-15d | %-20s | %-10.2f |%n", user.getUserId(),
 					user.getUserName(), user.getUserEmailId(), user.getUserPhoneNumber(),
 					user.getUserPreferredLocation(), user.getBalance());
@@ -161,7 +161,7 @@ public class AdminService {
 				"Preferred Location", "Balance");
 		System.out.println(
 				"------------------------------------------------------------------------------------------------------------------------");
-		for (User user : userDB.values()) {
+		for (Customer user : userDB.values()) {
 			if (user.getUserName().toLowerCase().startsWith(name.toLowerCase())) {
 				found = true;
 				System.out.printf("| %-8d | %-20s | %-25s | %-15d | %-20s | %-10.2f |%n", user.getUserId(),
@@ -184,7 +184,7 @@ public class AdminService {
 			return;
 		}
 		if (userDB.containsKey(userId)) {
-			User user = userDB.get(userId);
+			Customer user = userDB.get(userId);
 
 			System.out.println(
 					"------------------------------------------------------------------------------------------------------------------------");

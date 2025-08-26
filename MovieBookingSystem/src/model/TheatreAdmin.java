@@ -3,19 +3,18 @@ package model;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TheatreAdmin extends UserDetails{
+public class TheatreAdmin extends User{
 	
 	private List<Theatre> theatre;
 	
-	
 	public TheatreAdmin(Long theatreAdminId, String theatreAdminName, String theatreAdminEmailId,
 			Long theatreAdminPhoneNumber, String theatreAdminPassword, List<Theatre> theatre, String timeZone) {
-		super();
-		this.Id = theatreAdminId;
-		this.Name = theatreAdminName;
-		this.EmailId = theatreAdminEmailId;
-		this.PhoneNumber = theatreAdminPhoneNumber;
-		this.Password = theatreAdminPassword;
+	
+		this.id = theatreAdminId;
+		this.name = theatreAdminName;
+		this.emailId = theatreAdminEmailId;
+		this.phoneNumber = theatreAdminPhoneNumber;
+		this.password = theatreAdminPassword;
 		this.theatre = theatre;
 		this.timeZone = timeZone;
 	}
@@ -29,34 +28,34 @@ public class TheatreAdmin extends UserDetails{
 		
 	}
 	public String getTheatreAdminName() {
-		return Name;
+		return name;
 	}
 	public void setTheatreAdminName(String theatreAdminName) {
-		this.Name = theatreAdminName;
+		this.name = theatreAdminName;
 	}
 	public Long getTheatreAdminId() {
-		return Id;
+		return id;
 	}
 	public void setTheatreAdminId(Long theatreAdminId) {
-		this.Id = theatreAdminId;
+		this.id = theatreAdminId;
 	}
 	public String getTheatreAdminEmailId() {
-		return EmailId;
+		return emailId;
 	}
 	public void setTheatreAdminEmailId(String theatreAdminEmailId) {
-		this.EmailId = theatreAdminEmailId;
+		this.emailId = theatreAdminEmailId;
 	}
 	public Long getTheatreAdminPhoneNumber() {
-		return PhoneNumber;
+		return phoneNumber;
 	}
 	public void setTheatreAdminPhoneNumber(Long theatreAdminPhoneNumber) {
-		this.PhoneNumber = theatreAdminPhoneNumber;
+		this.phoneNumber = theatreAdminPhoneNumber;
 	}
 	public String getTheatreAdminPassword() {
-		return Password;
+		return password;
 	}
 	public void setTheatreAdminPassword(String theatreAdminPassword) {
-		this.Password = theatreAdminPassword;
+		this.password = theatreAdminPassword;
 	}
 	public List<Theatre> getTheatre() {
 		return theatre;
