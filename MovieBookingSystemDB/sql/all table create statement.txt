@@ -1,0 +1,105 @@
+-- ---------------- USERS ----------------
+CREATE TABLE users (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    emailId VARCHAR(255) UNIQUE NOT NULL,
+    name VARCHAR(255) NOT NULL,
+    phoneNumber BIGINT UNIQUE NOT NULL,
+    password VARCHAR(255) NOT NULL,
+    role ENUM('customer', 'theatreAdmin', 'admin') NOT NULL,
+    timeZone VARCHAR(100),
+    balance DOUBLE DEFAULT 0.0,
+    active BOOLEAN
+);
+
+-- ---------------- MOVIES ----------------
+CREATE TABLE movies (
+    movieId BIGINT PRIMARY KEY AUTO_INCREMENT,
+    movieTitle VARCHAR(255) NOT NULL,
+    duration INT NOT NULL,
+    releaseDate BIGINT NOT NULL,
+    language ENUM('Tamil', 'Telugu', 'English', 'Hindi', 'Malayalam') NOT NULL,
+    genre ENUM('Action', 'Drama', 'Comedy', 'Thriller', 'Historical') NOT NULL
+);
+
+-- ---------------- THEATRE ----------------
+CREATE TABLE theatre (
+    theatreId BIGINT PRIMARY KEY AUTO_INCREMENT,
+    theatreName VARCHAR(255) NOT NULL,
+    theatreLocation VARCHAR(255) NOT NULL,
+    status VARCHAR(50) NOT NULL
+);
+
+-- ---------------- SCREEN ----------------
+CREATE TABLE screen (
+    screenId BIGINT PRIMARY KEY AUTO_INCREMENT,
+    screenName VARCHAR(255) NOT NULL,
+    theatreId BIGINT NOT NULL,
+    status VARCHAR(50) NOT NULL,
+    FOREIGN KEY (theatreId) REFERENCES theatre(theatreId)
+);
+
+-- ---------------- SEAT ----------------
+CREATE TABLE seat (
+    seatId BIGINT PRIMARY KEY AUTO_INCREMENT,
+    screenId BIGINT NOT NULL,
+    seatNumber VARCHAR(10) NOT NULL,
+    seatType ENUM('Regular', 'Premium', 'VIP') NOT NULL,
+    price DOUBLE NOT NULL,
+    FOREIGN KEY (screenId) REFERENCES screen(screenId)
+);
+
+-- ---------------- SHOWS ----------------
+CREATE TABLE shows (
+    showId BIGINT PRIMARY KEY AUTO_INCREMENT,
+    movieId BIGINT NOT NULL,
+    screenId BIGINT NOT NULL,
+    theatreId BIGINT NOT NULL,
+    showDateTime BIGINT NOT NULL,
+    status VARCHAR(50),
+    FOREIGN KEY (movieId) REFERENCES movies(movieId),
+    FOREIGN KEY (screenId) REFERENCES screen(screenId),
+    FOREIGN KEY (theatreId) REFERENCES theatre(theatreId)
+);
+
+-- ---------------- BOOKING SEAT ----------------
+CREATE TABLE bookingSeat (
+    bookingSeatId BIGINT PRIMARY KEY AUTO_INCREMENT,
+    seatId BIGINT NOT NULL,
+    showId BIGINT NOT NULL,
+    isBooked BOOLEAN DEFAULT FALSE,
+    FOREIGN KEY (seatId) REFERENCES seat(seatId),
+    FOREIGN KEY (showId) REFERENCES shows(showId)
+);
+
+-- ---------------- TICKET ----------------
+CREATE TABLE ticket (
+    ticketId BIGINT PRIMARY KEY AUTO_INCREMENT,
+    userId BIGINT NOT NULL,
+    showId BIGINT NOT NULL,
+    amount DOUBLE NOT NULL,
+    ticketBookedDate BIGINT NOT NULL,
+    FOREIGN KEY (userId) REFERENCES users(id),
+    FOREIGN KEY (showId) REFERENCES shows(showId)
+);
+
+-- ---------------- BOOKED TICKET ----------------
+CREATE TABLE bookedTicket (
+    bookedTicketId BIGINT PRIMARY KEY AUTO_INCREMENT,
+    ticketId BIGINT NOT NULL,
+    bookingSeatId BIGINT NOT NULL,
+    FOREIGN KEY (ticketId) REFERENCES ticket(ticketId),
+    FOREIGN KEY (bookingSeatId) REFERENCES bookingSeat(bookingSeatId)
+);
+
+-- ---------------- REQUEST THEATRE ----------------
+CREATE TABLE requestTheatre (
+    requestId BIGINT PRIMARY KEY AUTO_INCREMENT,
+    theatreId BIGINT NOT NULL,
+    theatreAdminId BIGINT NOT NULL,
+    isApproved BOOLEAN DEFAULT FALSE,
+    approvedAdminId BIGINT,
+    FOREIGN KEY (theatreId) REFERENCES theatre(theatreId),
+    FOREIGN KEY (theatreAdminId) REFERENCES users(id),
+    FOREIGN KEY (approvedAdminId) REFERENCES users(id)
+);
+
